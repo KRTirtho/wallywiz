@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wallywiz/components/Home/Home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,8 +9,8 @@ void main() {
 // - unsplash
 // - pexels
 // - dicebear
-// - unsplash
 // - pixabay
+// - flickr
 // - NASA picture of the day
 // - Bing picture of the day (https://bing.biturl.top)
 // - Anime wallpaper grabber
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      home: const Home(),
     );
   }
 }
