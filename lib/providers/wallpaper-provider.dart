@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:cron/cron.dart';
+import 'package:wallywiz/extensions/duration.dart';
 
 enum RandomWallpaperAPI {
   reddit,
@@ -14,20 +16,43 @@ enum RandomWallpaperAPI {
 class _WallpaperProvider extends ChangeNotifier {
   RandomWallpaperAPI currentAPI;
 
-  Schedule schedule;
+  Duration schedule;
+
+  int location;
 
   _WallpaperProvider({
     required this.currentAPI,
     required this.schedule,
+    required this.location,
   });
 
-  setCurrentProvider(RandomWallpaperAPI api) {
+  void setCurrentProvider(RandomWallpaperAPI api) {
     currentAPI = api;
     notifyListeners();
   }
 
-  setSchedule(Schedule newSchedule) {
+  void setSchedule(Duration newSchedule) {
     schedule = newSchedule;
+    notifyListeners();
+  }
+
+  get cronExpression => "${schedule.minute} */${schedule.hour} * * *";
+
+  void scheduleWallpaper({
+    required String tempDir,
+    required RandomWallpaperAPI provider,
+    Duration? period,
+    int? location,
+  }) {
+    if (period != null) schedule = period;
+    if (location != null) this.location = location;
+    currentAPI = provider;
+    FlutterBackgroundService().invoke("schedule", {
+      "schedule": schedule.toString(),
+      "location": this.location,
+      "provider": provider.name,
+      "tempDir": tempDir,
+    });
     notifyListeners();
   }
 }
@@ -35,9 +60,10 @@ class _WallpaperProvider extends ChangeNotifier {
 final wallpaperProvider = ChangeNotifierProvider(
   (ref) {
     return _WallpaperProvider(
-      currentAPI: RandomWallpaperAPI.bing,
+      location: WallpaperManager.BOTH_SCREEN,
+      currentAPI: RandomWallpaperAPI.unsplash,
       // At 0 minutes past the hour, every 24 hours
-      schedule: Schedule.parse("0 0 */23 * * *"),
+      schedule: const Duration(hours: 2),
     );
   },
 );

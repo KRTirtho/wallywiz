@@ -1,13 +1,38 @@
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:wallywiz/models/BingPOD.dart';
 import 'package:wallywiz/models/NasaPOD.dart';
+import 'package:wallywiz/providers/wallpaper-provider.dart';
 import 'package:wallywiz/secrets.dart';
+
+WallpaperService _wallpaperService = WallpaperService();
 
 class WallpaperService {
   late Dio _dio;
 
   WallpaperService() {
     _dio = Dio(BaseOptions(responseType: ResponseType.json));
+    _dio.interceptors.add(DioCacheManager(CacheConfig()).interceptor);
+  }
+
+  factory WallpaperService.getInstance() => _wallpaperService;
+
+  Future<String> getWallpaperByProvider(RandomWallpaperAPI provider,
+      [String? subreddit]) {
+    switch (provider) {
+      case RandomWallpaperAPI.bing:
+        return getBingPOD();
+      case RandomWallpaperAPI.nasa:
+        return getNasaPOD();
+      case RandomWallpaperAPI.pexels:
+        return getPexelsRandom();
+      case RandomWallpaperAPI.pixabay:
+        return getPixabayRandom();
+      case RandomWallpaperAPI.reddit:
+        return getSubReddit(subreddit);
+      case RandomWallpaperAPI.unsplash:
+        return getUnsplashRandom();
+    }
   }
 
   Future<String> getBingPOD() async {
@@ -84,9 +109,10 @@ class WallpaperService {
     return hits.first["largeImageURL"];
   }
 
-  Future<String> getSubReddit([String subreddit = "Animewallpaper"]) async {
+  Future<String> getSubReddit([String? subreddit]) async {
+    subreddit ??= "Animewallpaper";
     final res = await _dio.get<Map<String, dynamic>>(
-      "https://www.reddit.com/r/Animewallpaper/.json",
+      "https://www.reddit.com/r/$subreddit/.json",
       queryParameters: {
         "q": "flair_name:\"Mobile\"",
         "restrict_sr": 1,
