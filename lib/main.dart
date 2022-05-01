@@ -67,6 +67,7 @@ void onStart(ServiceInstance service) {
       logger.v("[Running Scheduled job] at ${DateTime.now()}");
       final String url = await wallpaperService.getWallpaperByProvider(
         provider,
+        event["subreddit"],
       );
 
       logger.v("[Next Wallpaper] $url");

@@ -4,6 +4,8 @@ import 'package:wallywiz/components/shared/WallpaperProviderView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 
+const POD = [RandomWallpaperAPI.bing, RandomWallpaperAPI.nasa];
+
 const brandImages = {
   RandomWallpaperAPI.bing: "assets/bing-logo.png",
   RandomWallpaperAPI.nasa: "assets/nasa-logo.png",
@@ -32,38 +34,38 @@ class Home extends HookConsumerWidget {
                   (provider) {
                     return SizedBox(
                       width: 170,
-                      height: 250,
+                      height: 200,
                       child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 1,
-                                child: Image.asset(
-                                  brandImages[provider]!,
-                                  fit: BoxFit.contain,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WallpaperProviderView(
+                                  provider: provider,
+                                  isPictureOfTheDay: POD.contains(provider),
                                 ),
                               ),
-                              Text(
-                                toCapitalCase(provider.name),
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
-                              TextButton(
-                                child: const Text("View"),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          WallpaperProviderView(
-                                        provider: provider,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              )
-                            ],
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Image.asset(
+                                    brandImages[provider]!,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                Text(
+                                  toCapitalCase(provider.name),
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

@@ -43,6 +43,7 @@ class _WallpaperProvider extends ChangeNotifier {
     required RandomWallpaperAPI provider,
     Duration? period,
     int? location,
+    String? subreddit,
   }) {
     if (period != null) schedule = period;
     if (location != null) this.location = location;
@@ -52,6 +53,7 @@ class _WallpaperProvider extends ChangeNotifier {
       "location": this.location,
       "provider": provider.name,
       "tempDir": tempDir,
+      "subreddit": subreddit,
     });
     notifyListeners();
   }

@@ -61,11 +61,11 @@ class WallpaperService {
   Future<String> getPexelsRandom() async {
     final res = await _dio.get<Map<String, dynamic>>(
       "https://api.pexels.com/v1/curated",
-      queryParameters: {"per_page": 1},
       options: Options(
         headers: {"Authorization": pexelKey},
       ),
     );
+    res.data!["photos"].shuffle();
     return res.data!["photos"].first["src"]["portrait"] as String;
   }
 

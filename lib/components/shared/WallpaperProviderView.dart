@@ -28,9 +28,10 @@ class WallpaperProviderView extends HookConsumerWidget {
     );
     final wallpaper = ref.watch(wallpaperProvider);
     final tempSchedule = useState(wallpaper.schedule);
+    final controller = useTextEditingController(text: "MobileWallpaper");
     useEffect(() {
       wallpaperService
-          .getWallpaperByProvider(provider)
+          .getWallpaperByProvider(provider, controller.value.text)
           .then((url) => bgWallpaper.value = url);
       return null;
     }, []);
@@ -93,6 +94,17 @@ class WallpaperProviderView extends HookConsumerWidget {
                 ),
               ),
             ),
+          if (provider == RandomWallpaperAPI.reddit)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "e.g. AnimeWallpaper",
+                  labelText: "Subreddit",
+                ),
+              ),
+            ),
           Row(
             children: [
               Expanded(
@@ -109,6 +121,7 @@ class WallpaperProviderView extends HookConsumerWidget {
                                   ? const Duration(hours: 12)
                                   : tempSchedule.value,
                               tempDir: (await getTemporaryDirectory()).path,
+                              subreddit: controller.value.text,
                             );
                           }
                         : null,
