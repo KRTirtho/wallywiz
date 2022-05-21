@@ -127,11 +127,19 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       themeMode: preferences.themeMode,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
       ),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData.dark().copyWith(
+        useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[900],
+        ),
+        scaffoldBackgroundColor: Colors.grey[900],
+      ),
       home: const Home(),
     );
   }

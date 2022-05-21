@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Settings/Settings.dart';
 import 'package:wallywiz/components/shared/WallpaperProviderView.dart';
@@ -21,6 +23,20 @@ class Home extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final brightness = Theme.of(context).brightness;
+    useEffect(() {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarColor: brightness == Brightness.dark
+              ? Colors.grey[900]
+              : Colors.white, // status bar color
+          statusBarIconBrightness: brightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+        ),
+      );
+      return null;
+    }, [brightness]);
     return Scaffold(
       appBar: AppBar(
         title: const Text("WallyWiz"),

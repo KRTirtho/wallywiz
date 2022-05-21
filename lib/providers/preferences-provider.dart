@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +11,20 @@ class UserPreferences extends ChangeNotifier {
       {required this.wallpaperLocation, this.themeMode = ThemeMode.system}) {
     SharedPreferences.getInstance().then((value) {
       _localStorage = value;
+      initLocalState();
     });
+  }
+
+  void initLocalState() {
+    final map = toMap().keys.fold<Map<String, dynamic>>(
+      {},
+      (acc, key) {
+        acc[key] = _localStorage.get(key);
+        return acc;
+      },
+    );
+    wallpaperLocation = map["wallpaperLocation"];
+    themeMode = map["themeMode"];
   }
 
   Map<String, dynamic> toMap() {
