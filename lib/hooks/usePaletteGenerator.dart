@@ -9,7 +9,7 @@ PaletteGenerator usePaletteGenerator(String imageUrl) {
   ));
 
   useEffect(() {
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       palette.value = await PaletteGenerator.fromImageProvider(
         CachedNetworkImageProvider(
           imageUrl,

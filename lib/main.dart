@@ -9,6 +9,7 @@ import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wallywiz/components/Home/Home.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:wallywiz/providers/preferences-provider.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 import 'package:wallywiz/services/logger.dart';
 import 'package:wallywiz/services/wallpaper.dart';
@@ -17,7 +18,7 @@ import 'package:duration/duration.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid || Platform.isIOS) await initializeService();
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 Future<void> initializeService() async {
@@ -117,19 +118,21 @@ void onStart(ServiceInstance service) {
 // - Bing picture of the day (https://bing.biturl.top)
 // - Anime wallpaper grabber
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ProviderScope(
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const Home(),
+  Widget build(BuildContext context, ref) {
+    final preferences = ref.watch(userPreferencesProvider);
+    return MaterialApp(
+      title: 'Flutter Demo',
+      themeMode: preferences.themeMode,
+      theme: ThemeData(
+        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
+      darkTheme: ThemeData.dark(),
+      home: const Home(),
     );
   }
 }

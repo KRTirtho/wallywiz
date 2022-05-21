@@ -3,6 +3,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/extensions/duration.dart';
+import 'package:wallywiz/providers/preferences-provider.dart';
 
 enum RandomWallpaperAPI {
   reddit,
@@ -18,12 +19,12 @@ class _WallpaperProvider extends ChangeNotifier {
 
   Duration schedule;
 
-  int location;
+  ChangeNotifierProviderRef<_WallpaperProvider> ref;
 
   _WallpaperProvider({
     required this.currentAPI,
     required this.schedule,
-    required this.location,
+    required this.ref,
   });
 
   void setCurrentProvider(RandomWallpaperAPI api) {
@@ -42,15 +43,13 @@ class _WallpaperProvider extends ChangeNotifier {
     required String tempDir,
     required RandomWallpaperAPI provider,
     Duration? period,
-    int? location,
     String? subreddit,
   }) {
     if (period != null) schedule = period;
-    if (location != null) this.location = location;
     currentAPI = provider;
     FlutterBackgroundService().invoke("schedule", {
       "schedule": schedule.toString(),
-      "location": this.location,
+      "location": ref.read(userPreferencesProvider).wallpaperLocation,
       "provider": provider.name,
       "tempDir": tempDir,
       "subreddit": subreddit,
@@ -62,7 +61,7 @@ class _WallpaperProvider extends ChangeNotifier {
 final wallpaperProvider = ChangeNotifierProvider(
   (ref) {
     return _WallpaperProvider(
-      location: WallpaperManager.BOTH_SCREEN,
+      ref: ref,
       currentAPI: RandomWallpaperAPI.unsplash,
       // At 0 minutes past the hour, every 24 hours
       schedule: const Duration(hours: 2),

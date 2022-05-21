@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wallywiz/components/Settings/Settings.dart';
 import 'package:wallywiz/components/shared/WallpaperProviderView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
@@ -21,7 +22,20 @@ class Home extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text("WallyWiz"), centerTitle: false),
+      appBar: AppBar(
+        title: const Text("WallyWiz"),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const Settings(),
+              ));
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: LayoutBuilder(builder: (context, constrains) {
           return SizedBox(
