@@ -13,7 +13,15 @@ _WallyWizLogger getLogger<T>(T owner) {
 
 class _WallyWizLogger extends Logger {
   String? owner;
-  _WallyWizLogger([this.owner]) : super(filter: _WallyWizLogFilter());
+  _WallyWizLogger([this.owner])
+      : super(
+          filter: _WallyWizLogFilter(),
+          printer: PrettyPrinter(
+            colors: true,
+            printEmojis: true,
+          ),
+          output: ConsoleOutput(),
+        );
 
   @override
   void log(Level level, message, [error, StackTrace? stackTrace]) {
@@ -38,5 +46,14 @@ class _WallyWizLogFilter extends DevelopmentFilter {
       return true;
     }
     return super.shouldLog(event);
+  }
+}
+
+class ConsoleOutput extends LogOutput {
+  @override
+  void output(OutputEvent event) {
+    for (final line in event.lines) {
+      print(line);
+    }
   }
 }

@@ -31,6 +31,9 @@ Future<void> initializeService() async {
       // auto start service
       autoStart: true,
       isForegroundMode: true,
+      foregroundServiceNotificationTitle: "WallyWiz",
+      foregroundServiceNotificationContent:
+          "Wallpaper schedular running (RAM 2MB, CPU% 0.01%)",
     ),
     iosConfiguration: IosConfiguration(
       // auto start service
@@ -66,12 +69,14 @@ void onStart(ServiceInstance service) {
     logger.v("[selected provider] $provider");
     job([stamp]) async {
       logger.v("[Running Scheduled job] at ${DateTime.now()}");
+      print("[Running Scheduled job] at ${DateTime.now()}");
       final String url = await wallpaperService.getWallpaperByProvider(
         provider,
         event["subreddit"],
       );
 
       logger.v("[Next Wallpaper] $url");
+      print("[Next Wallpaper] $url");
 
       final res = await dio.get<List<int>>(url);
 
@@ -87,6 +92,7 @@ void onStart(ServiceInstance service) {
       ));
 
       logger.v("[Wallpaper path] ${outputFile.path}");
+      print("[Wallpaper path] ${outputFile.path}");
 
       outputFile.createSync(recursive: true);
 
@@ -98,6 +104,7 @@ void onStart(ServiceInstance service) {
       );
 
       logger.v("[Set Wallpaper Status] Success -> $success");
+      print("[Set Wallpaper Status] Success -> $success");
     }
 
     timer = Timer.periodic(parseTime(event["schedule"]), job);
@@ -132,6 +139,19 @@ class MyApp extends ConsumerWidget {
         useMaterial3: true,
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
+        inputDecorationTheme: const InputDecorationTheme(
+            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black, width: .5),
+            ),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2)),
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red, width: 2),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red, width: 2),
+            )),
       ),
       darkTheme: ThemeData.dark().copyWith(
         useMaterial3: true,
@@ -139,6 +159,19 @@ class MyApp extends ConsumerWidget {
           backgroundColor: Colors.grey[900],
         ),
         scaffoldBackgroundColor: Colors.grey[900],
+        inputDecorationTheme: const InputDecorationTheme(
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white, width: .5),
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue, width: 2)),
+          errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red, width: 2)),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+        ),
       ),
       home: const Home(),
     );

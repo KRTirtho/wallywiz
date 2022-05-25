@@ -1,51 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wallywiz/helpers/PersistedChangeNotifier.dart';
 
-class UserPreferences extends ChangeNotifier {
+class UserPreferences extends PersistedChangeNotifier {
   int wallpaperLocation;
   ThemeMode themeMode;
-  late SharedPreferences _localStorage;
   UserPreferences(
-      {required this.wallpaperLocation, this.themeMode = ThemeMode.system}) {
-    SharedPreferences.getInstance().then((value) {
-      _localStorage = value;
-      initLocalState();
-    });
-  }
+      {required this.wallpaperLocation, this.themeMode = ThemeMode.system})
+      : super();
 
-  void initLocalState() {
-    final map = toMap().keys.fold<Map<String, dynamic>>(
-      {},
-      (acc, key) {
-        acc[key] = _localStorage.get(key);
-        return acc;
-      },
-    );
+  @override
+  void loadFromLocal(Map<String, dynamic> map) {
     wallpaperLocation = map["wallpaperLocation"];
-    themeMode = map["themeMode"];
+    themeMode = ThemeMode.values[map["themeMode"]];
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       "wallpaperLocation": wallpaperLocation,
-      "themeMode": themeMode,
+      "themeMode": themeMode.index,
     };
-  }
-
-  Future<void> updatePersistence() async {
-    for (final entry in toMap().entries) {
-      if (entry.value is bool) {
-        await _localStorage.setBool(entry.key, entry.value);
-      } else if (entry.value is int) {
-        await _localStorage.setInt(entry.key, entry.value);
-      } else if (entry.value is double) {
-        await _localStorage.setDouble(entry.key, entry.value);
-      } else if (entry.value is String) {
-        await _localStorage.setString(entry.key, entry.value);
-      }
-    }
   }
 
   void setWallpaperLocation(int newLocation) {

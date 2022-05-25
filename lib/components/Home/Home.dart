@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Settings/Settings.dart';
+import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
 import 'package:wallywiz/components/shared/WallpaperProviderView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
@@ -52,6 +53,17 @@ class Home extends HookConsumerWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add_photo_alternate_rounded),
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) {
+              return CreateWallpaperProviderDialog();
+            },
+          ));
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SingleChildScrollView(
         child: LayoutBuilder(builder: (context, constrains) {
           return SizedBox(

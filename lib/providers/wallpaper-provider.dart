@@ -1,8 +1,11 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/extensions/duration.dart';
+import 'package:wallywiz/helpers/PersistedChangeNotifier.dart';
+import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/preferences-provider.dart';
 
 enum RandomWallpaperAPI {
@@ -14,18 +17,35 @@ enum RandomWallpaperAPI {
   pixabay,
 }
 
-class _WallpaperProvider extends ChangeNotifier {
+class _WallpaperProvider extends PersistedChangeNotifier {
   RandomWallpaperAPI currentAPI;
 
   Duration schedule;
 
   ChangeNotifierProviderRef<_WallpaperProvider> ref;
 
+  List<WallpaperSource> wallpaperSources;
+
   _WallpaperProvider({
     required this.currentAPI,
     required this.schedule,
     required this.ref,
-  });
+  })  : wallpaperSources = [],
+        super();
+
+  void addWallpaperSource(WallpaperSource source) {
+    if (wallpaperSources.any((element) => element.id == source.id)) return;
+    wallpaperSources = [...wallpaperSources, source];
+    notifyListeners();
+    updatePersistence();
+  }
+
+  void removeWallpaperSource(String srcId) {
+    wallpaperSources =
+        wallpaperSources.where((element) => element.id != srcId).toList();
+    notifyListeners();
+    updatePersistence();
+  }
 
   void setCurrentProvider(RandomWallpaperAPI api) {
     currentAPI = api;
@@ -55,6 +75,22 @@ class _WallpaperProvider extends ChangeNotifier {
       "subreddit": subreddit,
     });
     notifyListeners();
+  }
+
+  @override
+  FutureOr<void> loadFromLocal(Map<String, dynamic> map) {
+    wallpaperSources = (jsonDecode(map["wallpaperSources"] ?? "[]") as List)
+        .map((e) => WallpaperSource.fromJson(e))
+        .toList();
+  }
+
+  @override
+  FutureOr<Map<String, dynamic>> toMap() {
+    return {
+      "wallpaperSources": jsonEncode(
+        wallpaperSources.map((e) => e.toJson()).toList(),
+      )
+    };
   }
 }
 
