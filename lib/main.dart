@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,6 +21,28 @@ import 'package:duration/duration.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid || Platform.isIOS) await initializeService();
+  AwesomeNotifications().initialize(
+    // set the icon to null if you want to use the default app icon
+    null,
+    [
+      NotificationChannel(
+        channelGroupKey: 'wallywiz_channel_group',
+        channelKey: 'wallywiz_channel',
+        channelName: 'Wallywiz notifications',
+        channelDescription:
+            'Notification channel for Wallywiz wallpaper change notification',
+        playSound: true,
+      )
+    ],
+    // Channel groups are only visual and are not required
+    channelGroups: [
+      NotificationChannelGroup(
+        channelGroupkey: 'wallywiz_channel_group',
+        channelGroupName: 'Wallywiz Group',
+      )
+    ],
+    debug: kDebugMode,
+  );
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -103,6 +128,18 @@ void onStart(ServiceInstance service) {
         event["location"],
       );
 
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 10,
+          channelKey: 'wallywiz_channel',
+          title: 'New Wallpaper',
+          body: 'Wallpaper Changed to $url',
+          category: NotificationCategory.Social,
+          autoDismissible: true,
+          bigPicture: url,
+        ),
+      );
+
       logger.v("[Set Wallpaper Status] Success -> $success");
       print("[Set Wallpaper Status] Success -> $success");
     }
@@ -125,11 +162,24 @@ void onStart(ServiceInstance service) {
 // - Bing picture of the day (https://bing.biturl.top)
 // - Anime wallpaper grabber
 
-class MyApp extends ConsumerWidget {
+class MyApp extends HookConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, ref) {
+    useEffect(() {
+      AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+        if (!isAllowed) {
+          // This is just a basic example. For real apps, you must show some
+          // friendly dialog box before call the request method.
+          // This is very important to not harm the user experience
+          AwesomeNotifications().requestPermissionToSendNotifications();
+        }
+      });
+
+      return null;
+    }, []);
+
     final preferences = ref.watch(userPreferencesProvider);
     return MaterialApp(
       title: 'Flutter Demo',
