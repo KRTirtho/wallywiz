@@ -4,16 +4,17 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
-final _loggerFactory = _WallyWizLogger();
+final _loggerFactory = WallyWizLogger();
 
-_WallyWizLogger getLogger<T>(T owner) {
-  _loggerFactory.owner = owner is String ? owner : owner.toString();
+WallyWizLogger getLogger<T>(T owner, [WallyWizLogger? instance]) {
+  instance ??= _loggerFactory;
+  instance.owner = owner is String ? owner : owner.toString();
   return _loggerFactory;
 }
 
-class _WallyWizLogger extends Logger {
+class WallyWizLogger extends Logger {
   String? owner;
-  _WallyWizLogger([this.owner])
+  WallyWizLogger([this.owner])
       : super(
           filter: _WallyWizLogFilter(),
           printer: PrettyPrinter(
