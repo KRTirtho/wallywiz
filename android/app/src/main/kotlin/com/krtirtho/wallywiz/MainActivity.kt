@@ -1,4 +1,4 @@
-package com.example.wallywiz
+package com.krtirtho.wallywiz
 
 import io.flutter.embedding.android.FlutterActivity
 
