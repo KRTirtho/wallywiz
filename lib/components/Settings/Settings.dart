@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Settings/SettingsTile.dart';
-import 'package:wallywiz/providers/preferences-provider.dart';
+import 'package:wallywiz/providers/preferences.dart';
 
 class Settings extends ConsumerWidget {
   const Settings({Key? key}) : super(key: key);

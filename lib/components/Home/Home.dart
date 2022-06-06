@@ -4,26 +4,17 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Settings/Settings.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
-import 'package:wallywiz/components/shared/WallpaperProviderView.dart';
+import 'package:wallywiz/components/shared/WallpaperSupplierView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
-
-const POD = [RandomWallpaperAPI.bing, RandomWallpaperAPI.nasa];
-
-const brandImages = {
-  RandomWallpaperAPI.bing: "assets/bing-logo.png",
-  RandomWallpaperAPI.nasa: "assets/nasa-logo.png",
-  RandomWallpaperAPI.pexels: "assets/pexels-logo.png",
-  RandomWallpaperAPI.pixabay: "assets/pixabay-logo.png",
-  RandomWallpaperAPI.reddit: "assets/reddit-logo.png",
-  RandomWallpaperAPI.unsplash: "assets/unsplash-logo.png",
-};
 
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, ref) {
+    final wallpaperSources =
+        ref.watch(wallpaperProvider.select((s) => s.wallpaperSources));
     final brightness = Theme.of(context).brightness;
     useEffect(() {
       SystemChrome.setSystemUIOverlayStyle(
@@ -72,8 +63,8 @@ class Home extends HookConsumerWidget {
                 runSpacing: 8,
                 spacing: 8,
                 alignment: WrapAlignment.spaceEvenly,
-                children: RandomWallpaperAPI.values.map(
-                  (provider) {
+                children: wallpaperSources.map(
+                  (wallpaperSource) {
                     return SizedBox(
                       width: 170,
                       height: 200,
@@ -83,9 +74,8 @@ class Home extends HookConsumerWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => WallpaperProviderView(
-                                  provider: provider,
-                                  isPictureOfTheDay: POD.contains(provider),
+                                builder: (context) => WallpaperSupplierView(
+                                  wallpaperSource: wallpaperSource,
                                 ),
                               ),
                             );
@@ -97,13 +87,13 @@ class Home extends HookConsumerWidget {
                               children: [
                                 AspectRatio(
                                   aspectRatio: 1,
-                                  child: Image.asset(
-                                    brandImages[provider]!,
+                                  child: Image.network(
+                                    "https://avatars.dicebear.com/api/identicon/WallyWiz.png",
                                     fit: BoxFit.contain,
                                   ),
                                 ),
                                 Text(
-                                  toCapitalCase(provider.name),
+                                  toCapitalCase(wallpaperSource.name),
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
                               ],

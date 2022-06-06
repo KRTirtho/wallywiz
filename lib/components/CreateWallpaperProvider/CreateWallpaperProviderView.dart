@@ -14,11 +14,13 @@ class CreateWallpaperProviderDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final headerFields = useState([uuid.v4()]);
     final wp = ref.watch(wallpaperProvider);
 
     final nameController = useTextEditingController();
     final urlController = useTextEditingController();
     final jsonAccessorController = useTextEditingController();
+    final headerControllers = useState({});
 
     final id = useMemoized(() => uuid.v4());
     return Scaffold(
@@ -60,6 +62,68 @@ class CreateWallpaperProviderDialog extends HookConsumerWidget {
                   labelText: "API URL",
                 ),
               ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add_rounded),
+                label: const Text("New Header"),
+                onPressed: () {
+                  headerFields.value = [
+                    ...headerFields.value,
+                    uuid.v4(),
+                  ];
+                },
+              ),
+              const SizedBox(height: 10),
+              ...headerFields.value.map((id) {
+                return HookBuilder(
+                  builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          Flexible(child: TextFormField(
+                            onChanged: (value) {
+                              headerControllers.value = {
+                                ...headerControllers.value,
+                                id: {
+                                  ...headerControllers.value[id],
+                                  "key": value
+                                }
+                              };
+                            },
+                          )),
+                          const SizedBox(width: 10),
+                          Flexible(child: TextFormField(
+                            onChanged: (value) {
+                              headerControllers.value = {
+                                ...headerControllers.value,
+                                id: {
+                                  ...headerControllers.value[id],
+                                  "value": value
+                                }
+                              };
+                            },
+                          )),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline_rounded,
+                            ),
+                            color: Colors.red[300],
+                            onPressed: () {
+                              final prev = headerControllers.value;
+                              prev.remove(id);
+                              headerControllers.value = prev;
+                              headerFields.value = headerFields.value
+                                  .where((element) => element != id)
+                                  .toList();
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }).toList(),
               const SizedBox(height: 10),
               TextFormField(
                 controller: jsonAccessorController,

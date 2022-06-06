@@ -1,12 +1,9 @@
 import 'dart:io';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Home/Home.dart';
-import 'package:wallywiz/providers/preferences-provider.dart';
+import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/services/background_service.dart';
 
 void main() async {
@@ -29,19 +26,6 @@ class MyApp extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    useEffect(() {
-      AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-        if (!isAllowed) {
-          // This is just a basic example. For real apps, you must show some
-          // friendly dialog box before call the request method.
-          // This is very important to not harm the user experience
-          AwesomeNotifications().requestPermissionToSendNotifications();
-        }
-      });
-
-      return null;
-    }, []);
-
     final preferences = ref.watch(userPreferencesProvider);
     return MaterialApp(
       title: 'Flutter Demo',

@@ -7,10 +7,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:uuid/uuid.dart';
-import 'package:wallywiz/providers/wallpaper-provider.dart';
+import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/services/logger.dart';
-import 'package:wallywiz/services/wallpaper.dart';
 import 'package:path/path.dart' as path;
+import 'package:wallywiz/extensions/map.dart';
 
 Future<void> initBackgroundService() async {
   final service = FlutterBackgroundService();
@@ -49,7 +49,6 @@ bool onIosBackground(ServiceInstance service) {
 
 void onStart(ServiceInstance service) async {
   Timer? timer;
-  WallpaperService wallpaperService = WallpaperService();
   const uuid = Uuid();
   final dio = Dio(BaseOptions(responseType: ResponseType.bytes));
   final logInstance = WallyWizLogger();
@@ -58,30 +57,31 @@ void onStart(ServiceInstance service) async {
     if (event == null) return;
     if (timer?.isActive == true) timer?.cancel();
     final logger = logInstance..owner = "BackgroundService -> schedule";
-    final provider = RandomWallpaperAPI.values.byName(event["provider"]);
-    logger.v("[selected provider] $provider");
+    final source = WallpaperSource.fromJson(event["source"]);
+    logger.v("[selected source] $source");
     job([stamp]) async {
       logger.v("[Running Scheduled job] at ${DateTime.now()}");
       print("[Running Scheduled job] at ${DateTime.now()}");
-      final String url = await wallpaperService.getWallpaperByProvider(
-        provider,
-        event["subreddit"],
-      );
-
+      final res = (await dio.get(
+        source.url,
+        options: Options(
+          headers: source.headers,
+          responseType: ResponseType.json,
+        ),
+      ))
+          .data as Map?;
+      if (res == null) return;
+      final String url = res.getNestedProperty(source.jsonAccessor);
       logger.v("[Next Wallpaper] $url");
       print("[Next Wallpaper] $url");
 
-      final res = await dio.get<List<int>>(url);
+      final imageBytes = await dio.get<List<int>>(url);
 
-      if (res.data == null) return;
-      // unsplash uses hotlink so there's no requirement of file
-      // extension thus its provided through queryParameters
-      final extension = provider == RandomWallpaperAPI.unsplash
-          ? Uri.parse(url).queryParameters["fm"] ?? "jpg"
-          : path.extension(Uri.parse(url).path);
+      if (imageBytes.data == null) return;
+
       final outputFile = File(path.join(
         event["tempDir"],
-        "${uuid.v4()}.$extension",
+        "${uuid.v4()}.${source.imageType.name}",
       ));
 
       logger.v("[Wallpaper path] ${outputFile.path}");
@@ -89,7 +89,7 @@ void onStart(ServiceInstance service) async {
 
       outputFile.createSync(recursive: true);
 
-      outputFile.writeAsBytesSync(res.data!);
+      outputFile.writeAsBytesSync(imageBytes.data!);
 
       final success = await WallpaperManager.setWallpaperFromFile(
         outputFile.path,

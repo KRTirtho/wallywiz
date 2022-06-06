@@ -12,8 +12,8 @@ class UserPreferences extends PersistedChangeNotifier {
 
   @override
   void loadFromLocal(Map<String, dynamic> map) {
-    wallpaperLocation = map["wallpaperLocation"];
-    themeMode = ThemeMode.values[map["themeMode"]];
+    wallpaperLocation = map["wallpaperLocation"] ?? wallpaperLocation;
+    themeMode = ThemeMode.values[map["themeMode"] ?? themeMode.index];
   }
 
   @override
