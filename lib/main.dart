@@ -1,16 +1,92 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Home/Home.dart';
 import 'package:wallywiz/providers/preferences.dart';
-import 'package:wallywiz/services/background_service.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
+import 'package:uuid/uuid.dart';
+import 'package:wallywiz/models/WallpaperSource.dart';
+import 'package:wallywiz/services/logger.dart';
+import 'package:path/path.dart' as path;
+import 'package:wallywiz/extensions/map.dart';
+
+void callbackDispatcher() {
+  print("callbackDispatcher");
+  Workmanager().executeTask(
+    (taskName, inputData) async {
+      final logInstance = WallyWizLogger();
+      final dio = Dio(BaseOptions(responseType: ResponseType.bytes));
+      const uuid = Uuid();
+      final logger = logInstance..owner = "BackgroundService -> schedule";
+      try {
+        if (taskName == WALLPAPER_TASK_NAME) {
+          if (inputData == null) return false;
+          final source =
+              WallpaperSource.fromJson(jsonDecode(inputData["source"]));
+          logger.v("[selected source] $source");
+          logger.v("[Running Scheduled job] at ${DateTime.now()}");
+          print("[Running Scheduled job] at ${DateTime.now()}");
+          final res = (await dio.get(
+            source.url,
+            options: Options(
+              headers: source.headers,
+              responseType: ResponseType.json,
+            ),
+          ))
+              .data as Map?;
+          if (res == null) return false;
+          final String url = res.getNestedProperty(source.jsonAccessor);
+          logger.v("[Next Wallpaper] $url");
+          print("[Next Wallpaper] $url");
+
+          final imageBytes = await dio.get<List<int>>(url);
+
+          if (imageBytes.data == null) return false;
+
+          final outputFile = File(path.join(
+            inputData["tempDir"],
+            "${uuid.v4()}.${source.imageType.name}",
+          ));
+
+          logger.v("[Wallpaper path] ${outputFile.path}");
+          print("[Wallpaper path] ${outputFile.path}");
+
+          outputFile.createSync(recursive: true);
+
+          outputFile.writeAsBytesSync(imageBytes.data!);
+
+          final success = await WallpaperManager.setWallpaperFromFile(
+            outputFile.path,
+            inputData["location"],
+          );
+
+          logger.v("[Set Wallpaper Status] Success -> $success");
+          print("[Set Wallpaper Status] Success -> $success");
+          return true;
+        }
+        return false;
+      } catch (e, stack) {
+        logger.e("Failed to execute task", e, stack);
+        rethrow;
+      }
+    },
+  );
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isAndroid || Platform.isIOS) await initBackgroundService();
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
   runApp(const ProviderScope(child: MyApp()));
 }
+
+// ignore: constant_identifier_names
+const WALLPAPER_TASK_NAME = "wallpaper-change-task";
+// ignore: constant_identifier_names
+const WALLPAPER_TASK_UNIQUE_NAME = "wallpaper-change-task";
 // list of wallpaper sources
 // - unsplash
 // - pexels

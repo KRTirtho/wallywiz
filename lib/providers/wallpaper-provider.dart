@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:duration/duration.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
-import 'package:wallywiz/extensions/duration.dart';
 import 'package:wallywiz/helpers/PersistedChangeNotifier.dart';
+import 'package:wallywiz/main.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/secrets.dart';
+import 'package:workmanager/workmanager.dart';
 
 enum RandomWallpaperAPI {
   reddit,
@@ -52,19 +52,26 @@ class _WallpaperProvider extends PersistedChangeNotifier {
     updatePersistence();
   }
 
-  void scheduleWallpaper2({
+  void scheduleWallpaperChanger({
     required String tempDir,
     required WallpaperSource source,
     Duration? period,
-  }) {
+  }) async {
     if (period != null) schedule = period;
     currentWallpaperSource = source;
-    FlutterBackgroundService().invoke("schedule", {
-      "schedule": schedule.toString(),
-      "location": ref.read(userPreferencesProvider).wallpaperLocation,
-      "source": source.toJson(),
-      "tempDir": tempDir,
-    });
+
+    Workmanager().registerPeriodicTask(
+      WALLPAPER_TASK_UNIQUE_NAME,
+      WALLPAPER_TASK_NAME,
+      existingWorkPolicy: ExistingWorkPolicy.replace,
+      inputData: {
+        "location": ref.read(userPreferencesProvider).wallpaperLocation,
+        "source": jsonEncode(source.toJson()),
+        "tempDir": tempDir,
+      },
+      constraints: Constraints(networkType: NetworkType.connected),
+      frequency: schedule,
+    );
     updatePersistence();
     notifyListeners();
   }
@@ -82,26 +89,6 @@ class _WallpaperProvider extends PersistedChangeNotifier {
 
   void setSchedule(Duration newSchedule) {
     schedule = newSchedule;
-    notifyListeners();
-  }
-
-  get cronExpression => "${schedule.minute} */${schedule.hour} * * *";
-
-  void scheduleWallpaper({
-    required String tempDir,
-    required RandomWallpaperAPI provider,
-    Duration? period,
-    String? subreddit,
-  }) {
-    if (period != null) schedule = period;
-    currentAPI = provider;
-    FlutterBackgroundService().invoke("schedule", {
-      "schedule": schedule.toString(),
-      "location": ref.read(userPreferencesProvider).wallpaperLocation,
-      "provider": provider.name,
-      "tempDir": tempDir,
-      "subreddit": subreddit,
-    });
     notifyListeners();
   }
 

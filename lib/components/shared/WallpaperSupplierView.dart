@@ -102,7 +102,7 @@ class WallpaperSupplierView extends HookConsumerWidget {
                                 wallpaperSource.url ||
                             wallpaper.schedule != tempSchedule.value
                         ? () async {
-                            wallpaper.scheduleWallpaper2(
+                            wallpaper.scheduleWallpaperChanger(
                               source: wallpaperSource,
                               period: tempSchedule.value,
                               tempDir: (await getTemporaryDirectory()).path,
