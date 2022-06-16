@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Settings/Settings.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
+import 'package:wallywiz/components/shared/MarqueeText.dart';
 import 'package:wallywiz/components/shared/WallpaperSupplierView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
@@ -49,7 +52,7 @@ class Home extends HookConsumerWidget {
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) {
-              return CreateWallpaperProviderDialog();
+              return CreateWallpaperProviderView();
             },
           ));
         },
@@ -87,14 +90,24 @@ class Home extends HookConsumerWidget {
                               children: [
                                 AspectRatio(
                                   aspectRatio: 1,
-                                  child: Image.network(
-                                    "https://avatars.dicebear.com/api/identicon/WallyWiz.png",
-                                    fit: BoxFit.contain,
-                                  ),
+                                  child: wallpaperSource.logoSource
+                                          .startsWith("http")
+                                      ? Image.network(
+                                          wallpaperSource.logoSource,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.file(
+                                          File(wallpaperSource.logoSource),
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
-                                Text(
-                                  toCapitalCase(wallpaperSource.name),
-                                  style: Theme.of(context).textTheme.headline6,
+                                Flexible(
+                                  child: MarqueeText(
+                                    text: toCapitalCase(wallpaperSource.name),
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
+                                    staticLimit: 10,
+                                  ),
                                 ),
                               ],
                             ),

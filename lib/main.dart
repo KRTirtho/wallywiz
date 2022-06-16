@@ -15,11 +15,14 @@ import 'package:path/path.dart' as path;
 import 'package:wallywiz/extensions/map.dart';
 
 void callbackDispatcher() {
-  print("callbackDispatcher");
   Workmanager().executeTask(
     (taskName, inputData) async {
       final logInstance = WallyWizLogger();
-      final dio = Dio(BaseOptions(responseType: ResponseType.bytes));
+      final dio = Dio(BaseOptions(
+        responseType: ResponseType.bytes,
+        sendTimeout: 60 * 1000, // 1 minute
+        receiveTimeout: 3 * 60 * 1000, // 3 minutes
+      ));
       const uuid = Uuid();
       final logger = logInstance..owner = "BackgroundService -> schedule";
       try {

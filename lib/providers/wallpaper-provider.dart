@@ -10,6 +10,7 @@ import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/secrets.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:collection/collection.dart';
 
 enum RandomWallpaperAPI {
   reddit,
@@ -40,6 +41,16 @@ class _WallpaperProvider extends PersistedChangeNotifier {
 
   void addWallpaperSource(WallpaperSource source) {
     if (wallpaperSources.any((element) => element.id == source.id)) return;
+    wallpaperSources = [...wallpaperSources, source];
+    notifyListeners();
+    updatePersistence();
+  }
+
+  void updateWallpaperSource(String id, WallpaperSource source) {
+    if (wallpaperSources.none((element) => element.id == source.id)) return;
+
+    wallpaperSources =
+        wallpaperSources.where((element) => element.id != source.id).toList();
     wallpaperSources = [...wallpaperSources, source];
     notifyListeners();
     updatePersistence();

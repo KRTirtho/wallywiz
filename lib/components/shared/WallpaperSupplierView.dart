@@ -1,16 +1,18 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/hooks/usePaletteGenerator.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/futures.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
+import 'package:wallywiz/utils/NumericalRangeFormatter.dart';
 
 class WallpaperSupplierView extends HookConsumerWidget {
   final WallpaperSource wallpaperSource;
@@ -26,10 +28,37 @@ class WallpaperSupplierView extends HookConsumerWidget {
           "https://avatars.dicebear.com/api/human/wallywiz.png",
     );
     final wallpaper = ref.watch(wallpaperProvider);
-    final tempSchedule = useState(wallpaper.schedule);
+
+    final prevScheduleValues = wallpaper.schedule.toString().split(":");
+
+    final hourController = useTextEditingController(text: "");
+    final minuteController = useTextEditingController(text: "");
+
+    final tempSchedule = Duration(
+      hours: int.tryParse(hourController.value.text) ??
+          int.tryParse(prevScheduleValues.first) ??
+          0,
+      minutes: int.tryParse(minuteController.value.text) ??
+          int.tryParse(prevScheduleValues[1]) ??
+          0,
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(wallpaperSource.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) {
+                  return CreateWallpaperProviderView(
+                    wallpaperSource: wallpaperSource,
+                  );
+                },
+              ));
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [
@@ -70,26 +99,43 @@ class WallpaperSupplierView extends HookConsumerWidget {
           }),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListTile(
-              title: const Text("Wallpaper change period"),
-              trailing: TextButton(
-                child: Text(
-                  tempSchedule.value
-                      .toString()
-                      .split(":")
-                      .sublist(0, 2)
-                      .join(":"),
-                ),
-                onPressed: () async {
-                  final duration = await showDurationPicker(
-                    context: context,
-                    initialTime: tempSchedule.value,
-                    snapToMins: 10,
-                  );
-                  if (duration != null) tempSchedule.value = duration;
-                },
+            child: Column(children: [
+              const Text("Wallpaper change interval"),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Flexible(
+                    child: TextFormField(
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(2),
+                        NumericalRangeFormatter(max: 23, min: 0),
+                      ],
+                      keyboardType: TextInputType.number,
+                      controller: hourController,
+                      decoration: const InputDecoration(
+                        label: Text("Hour"),
+                        hintText: "between 0 to 23",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: TextFormField(
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(2),
+                        NumericalRangeFormatter(max: 59, min: 0),
+                      ],
+                      keyboardType: TextInputType.number,
+                      controller: minuteController,
+                      decoration: const InputDecoration(
+                        label: Text("Minute"),
+                        hintText: "between 0 to 59",
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ]),
           ),
           Row(
             children: [
@@ -98,13 +144,14 @@ class WallpaperSupplierView extends HookConsumerWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     child: const Text("Use"),
-                    onPressed: wallpaper.currentWallpaperSource?.url !=
-                                wallpaperSource.url ||
-                            wallpaper.schedule != tempSchedule.value
+                    onPressed: (wallpaper.schedule != tempSchedule &&
+                                tempSchedule != Duration.zero) ||
+                            wallpaper.currentWallpaperSource?.url !=
+                                wallpaperSource.url
                         ? () async {
                             wallpaper.scheduleWallpaperChanger(
                               source: wallpaperSource,
-                              period: tempSchedule.value,
+                              period: tempSchedule,
                               tempDir: (await getTemporaryDirectory()).path,
                             );
                           }

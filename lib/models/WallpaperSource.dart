@@ -7,14 +7,23 @@ class WallpaperSource {
   final String jsonAccessor;
   final Map<String, dynamic> headers;
   final WallpaperImageType imageType;
+
+  /// This can be a base64 encoded image String or a path to image
+  late final String logoSource;
   WallpaperSource({
     required this.id,
     required this.jsonAccessor,
     required this.name,
     required this.url,
+
+    /// This can be a base64 encoded image String or a path to image
+    String? logoSource,
     this.imageType = WallpaperImageType.jpg,
     this.headers = const {},
-  });
+  }) {
+    this.logoSource =
+        logoSource ?? "https://avatars.dicebear.com/api/identicon/$name.png";
+  }
 
   List<String> get propertyAccessors => jsonAccessor.split(".");
 
@@ -25,7 +34,10 @@ class WallpaperSource {
         url = map["url"],
         imageType = WallpaperImageType
             .values[map["imageType"] ?? WallpaperImageType.jpg.index],
-        headers = map["headers"] ?? {};
+        headers = map["headers"] ?? {} {
+    logoSource = map["logoSource"] ??
+        "https://avatars.dicebear.com/api/identicon/$name.png";
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -34,7 +46,8 @@ class WallpaperSource {
       "name": name,
       "url": url,
       "imageType": imageType.index,
-      "headers": headers
+      "headers": headers,
+      "logoSource": logoSource,
     };
   }
 }
