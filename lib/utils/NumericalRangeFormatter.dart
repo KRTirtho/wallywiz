@@ -13,6 +13,8 @@ class NumericalRangeFormatter extends TextInputFormatter {
   ) {
     if (newValue.text == '') {
       return newValue;
+    } else if (newValue.text.contains(".")) {
+      return oldValue;
     } else if (int.parse(newValue.text) < min) {
       return const TextEditingValue().copyWith(text: min.toStringAsFixed(2));
     } else {

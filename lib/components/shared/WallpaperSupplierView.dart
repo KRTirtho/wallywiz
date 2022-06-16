@@ -16,8 +16,10 @@ import 'package:wallywiz/utils/NumericalRangeFormatter.dart';
 
 class WallpaperSupplierView extends HookConsumerWidget {
   final WallpaperSource wallpaperSource;
-  const WallpaperSupplierView({Key? key, required this.wallpaperSource})
+  WallpaperSupplierView({Key? key, required this.wallpaperSource})
       : super(key: key);
+
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context, ref) {
@@ -34,14 +36,6 @@ class WallpaperSupplierView extends HookConsumerWidget {
     final hourController = useTextEditingController(text: "");
     final minuteController = useTextEditingController(text: "");
 
-    final tempSchedule = Duration(
-      hours: int.tryParse(hourController.value.text) ??
-          int.tryParse(prevScheduleValues.first) ??
-          0,
-      minutes: int.tryParse(minuteController.value.text) ??
-          int.tryParse(prevScheduleValues[1]) ??
-          0,
-    );
     return Scaffold(
       appBar: AppBar(
         title: Text(wallpaperSource.name),
@@ -102,38 +96,41 @@ class WallpaperSupplierView extends HookConsumerWidget {
             child: Column(children: [
               const Text("Wallpaper change interval"),
               const SizedBox(height: 10),
-              Row(
-                children: [
-                  Flexible(
-                    child: TextFormField(
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(2),
-                        NumericalRangeFormatter(max: 23, min: 0),
-                      ],
-                      keyboardType: TextInputType.number,
-                      controller: hourController,
-                      decoration: const InputDecoration(
-                        label: Text("Hour"),
-                        hintText: "between 0 to 23",
+              Form(
+                key: formKey,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextFormField(
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(2),
+                          NumericalRangeFormatter(max: 23, min: 0),
+                        ],
+                        keyboardType: TextInputType.number,
+                        controller: hourController,
+                        decoration: const InputDecoration(
+                          label: Text("Hour"),
+                          hintText: "between 0 to 23",
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(2),
-                        NumericalRangeFormatter(max: 59, min: 0),
-                      ],
-                      keyboardType: TextInputType.number,
-                      controller: minuteController,
-                      decoration: const InputDecoration(
-                        label: Text("Minute"),
-                        hintText: "between 0 to 59",
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: TextFormField(
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(2),
+                          NumericalRangeFormatter(max: 59, min: 0),
+                        ],
+                        keyboardType: TextInputType.number,
+                        controller: minuteController,
+                        decoration: const InputDecoration(
+                          label: Text("Minute"),
+                          hintText: "between 0 to 59",
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ]),
           ),
@@ -144,18 +141,53 @@ class WallpaperSupplierView extends HookConsumerWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     child: const Text("Use"),
-                    onPressed: (wallpaper.schedule != tempSchedule &&
-                                tempSchedule != Duration.zero) ||
-                            wallpaper.currentWallpaperSource?.url !=
-                                wallpaperSource.url
-                        ? () async {
-                            wallpaper.scheduleWallpaperChanger(
-                              source: wallpaperSource,
-                              period: tempSchedule,
-                              tempDir: (await getTemporaryDirectory()).path,
-                            );
-                          }
-                        : null,
+                    onPressed: () async {
+                      final tempSchedule = Duration(
+                        hours: int.tryParse(hourController.value.text) ??
+                            int.tryParse(prevScheduleValues.first) ??
+                            0,
+                        minutes: int.tryParse(minuteController.value.text) ??
+                            int.tryParse(prevScheduleValues[1]) ??
+                            0,
+                      );
+                      final isSameSchedule =
+                          wallpaper.schedule != tempSchedule &&
+                              tempSchedule > const Duration(minutes: 15);
+                      final isSameSource =
+                          wallpaper.currentWallpaperSource?.url !=
+                              wallpaperSource.url;
+
+                      if (isSameSchedule || isSameSource) {
+                        wallpaper.scheduleWallpaperChanger(
+                          source: wallpaperSource,
+                          period: tempSchedule,
+                          tempDir: (await getTemporaryDirectory()).path,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            content: Text(
+                              "Successfully set ${wallpaperSource.name} as default wallpaper provider",
+                            ),
+                          ),
+                        );
+                        formKey.currentState?.reset();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red[400],
+                            behavior: SnackBarBehavior.floating,
+                            content: Text(
+                              tempSchedule <= const Duration(minutes: 15)
+                                  ? "Interval must be more than 15 minutes"
+                                  : isSameSource && !isSameSchedule
+                                      ? "${wallpaperSource.name} is already set as default"
+                                      : "New interval ${tempSchedule.toString().replaceAll(RegExp(r"\..*"), "")} is no different than old ${wallpaper.schedule.toString().replaceAll(RegExp(r"\..*"), "")} interval",
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
               ),

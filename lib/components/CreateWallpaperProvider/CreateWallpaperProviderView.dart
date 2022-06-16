@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,6 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wallywiz/components/shared/MarqueeText.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 import 'package:path/path.dart' as path;
@@ -37,6 +39,19 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
 
     final logo = useState<String?>(null);
 
+    saveIcon() async {
+      final logoXFile = await imagePicker.pickImage(
+        source: ImageSource.gallery,
+      );
+      if (logoXFile == null) return;
+      final localPath = path.join(
+        (await getApplicationDocumentsDirectory()).path,
+        path.basename(logoXFile.path),
+      );
+      await logoXFile.saveTo(localPath);
+      logo.value = localPath;
+    }
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -46,7 +61,15 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
             onPressed: () => Navigator.pop(context),
           )
         ],
-        title: const Text("Add Wallpaper Provider"),
+        title: SizedBox(
+          height: 25,
+          child: MarqueeText(
+            text: wallpaperSource != null
+                ? "Update configuration of ${wallpaperSource?.name}"
+                : "Add Wallpaper Provider",
+            staticLimit: 23,
+          ),
+        ),
       ),
       body: Form(
         key: formKey,
@@ -55,20 +78,31 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(
-                icon: const Icon(Icons.add_photo_alternate),
-                onPressed: () async {
-                  final logoXFile = await imagePicker.pickImage(
-                    source: ImageSource.gallery,
-                  );
-                  if (logoXFile == null) return;
-                  final localPath = path.join(
-                    (await getApplicationDocumentsDirectory()).path,
-                    path.basename(logoXFile.path),
-                  );
-                  await logoXFile.saveTo(localPath);
-                  logo.value = localPath;
-                },
+              Center(
+                child: Column(
+                  children: [
+                    IconButton(
+                      icon: wallpaperSource?.logoSource == null &&
+                              logo.value == null
+                          ? const Icon(Icons.add_photo_alternate)
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: Image.file(
+                                File(
+                                  logo.value ?? wallpaperSource!.logoSource,
+                                ),
+                              ),
+                            ),
+                      iconSize: wallpaperSource?.logoSource == null ? 70 : 100,
+                      onPressed: saveIcon,
+                    ),
+                    Text(
+                      "Logo",
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                    const SizedBox(height: 20)
+                  ],
+                ),
               ),
               TextFormField(
                 controller: nameController,
