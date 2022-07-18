@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wallywiz/components/CreateWallpaperProvider/HeaderDialog.dart';
 import 'package:wallywiz/components/shared/MarqueeText.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
@@ -38,6 +38,8 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
         () => wallpaperSource?.id ?? uuid.v4(), [wallpaperSource?.id]);
 
     final logo = useState<String?>(null);
+
+    final headers = useState<List<Map<String, String>>>([]);
 
     saveIcon() async {
       final logoXFile = await imagePicker.pickImage(
@@ -75,8 +77,8 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
         key: formKey,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+            shrinkWrap: true,
             children: [
               Center(
                 child: Column(
@@ -129,8 +131,63 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
               ElevatedButton.icon(
                 icon: const Icon(Icons.add_rounded),
                 label: const Text("New Header"),
-                onPressed: () {},
+                onPressed: () async {
+                  headers.value = [
+                    ...headers.value,
+                    await showDialog(
+                        context: context,
+                        builder: (context) => const HeaderDialog())
+                  ];
+                },
               ),
+              ...headers.value.map((header) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("key: ${header["name"]}"),
+                      Text("value: ${header["value"]}"),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: () async {
+                              final updatedData = await showDialog(
+                                context: context,
+                                builder: (context) => HeaderDialog(
+                                  id: header["id"],
+                                  name: header["name"],
+                                  value: header["value"],
+                                ),
+                              ) as Map<String, String>?;
+                              if (updatedData == null) return;
+                              headers.value = headers.value.map((h) {
+                                if (h["id"] == header["id"]) {
+                                  return updatedData;
+                                }
+                                return h;
+                              }).toList();
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () {
+                              headers.value = headers.value
+                                  .where(
+                                    (h) => h["id"] != header["id"],
+                                  )
+                                  .toList();
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              const SizedBox(height: 10),
+              const Divider(),
               const SizedBox(height: 10),
               TextFormField(
                 controller: jsonAccessorController,
@@ -141,7 +198,7 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
                   labelText: "JSON property accessor",
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -155,6 +212,13 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
                             name: nameController.value.text,
                             url: urlController.value.text,
                             logoSource: logo.value,
+                            headers: headers.value.fold(
+                              {},
+                              (acc, val) {
+                                acc[val["name"] as String] = val["value"];
+                                return acc;
+                              },
+                            ),
                           );
                           if (wallpaperSource == null) {
                             wp.addWallpaperSource(source);

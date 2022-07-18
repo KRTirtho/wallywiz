@@ -53,6 +53,7 @@ dependencies:
   workmanager: ^0.5.0
   marquee: ^2.2.3
   image_picker: ^0.8.5+3
+  image_picker_android: ^0.8.5+1
 
 dev_dependencies:
   flutter_test:

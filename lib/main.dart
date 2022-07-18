@@ -82,7 +82,9 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  if (Platform.isAndroid) {
+    await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  }
   runApp(const ProviderScope(child: MyApp()));
 }
 

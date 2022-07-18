@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Settings/Settings.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
 import 'package:wallywiz/components/shared/MarqueeText.dart';
-import 'package:wallywiz/components/shared/WallpaperSupplierView.dart';
+import 'package:wallywiz/components/WallpaperSupplierView/WallpaperSupplierView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 
