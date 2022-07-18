@@ -143,14 +143,17 @@ final wallpaperProvider = ChangeNotifierProvider(
             jsonAccessor: "hdurl",
             name: "Nasa",
             url: "https://api.nasa.gov/planetary/apod?api_key=$nasaKey",
+            isOfficial: true,
           ),
           WallpaperSource(
             id: uuid.v4(),
             jsonAccessor: "url",
             name: "Bing",
             url: "https://bing.biturl.top",
+            isOfficial: true,
           ),
           WallpaperSource(
+              isOfficial: true,
               id: uuid.v4(),
               name: "Unsplash",
               url:
@@ -159,6 +162,7 @@ final wallpaperProvider = ChangeNotifierProvider(
               headers: {"Authorization": "Client-ID $unsplashKey"}),
           WallpaperSource(
             id: uuid.v4(),
+            isOfficial: true,
             name: "Pexels",
             url: "https://api.pexels.com/v1/curated",
             headers: {"Authorization": pexelKey},
@@ -166,6 +170,7 @@ final wallpaperProvider = ChangeNotifierProvider(
           ),
           WallpaperSource(
             id: uuid.v4(),
+            isOfficial: true,
             name: "Pixabay",
             url:
                 "https://pixabay.com/api?key=$pixabayKey&image_type=photo&orientation=vertical&safesearch=true&order=popular",

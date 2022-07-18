@@ -7,6 +7,7 @@ class WallpaperSource {
   final String jsonAccessor;
   final Map<String, dynamic> headers;
   final WallpaperImageType imageType;
+  final bool isOfficial;
 
   /// This can be a base64 encoded image String or a path to image
   late final String logoSource;
@@ -15,6 +16,7 @@ class WallpaperSource {
     required this.jsonAccessor,
     required this.name,
     required this.url,
+    required this.isOfficial,
 
     /// This can be a base64 encoded image String or a path to image
     String? logoSource,
@@ -34,6 +36,7 @@ class WallpaperSource {
         url = map["url"],
         imageType = WallpaperImageType
             .values[map["imageType"] ?? WallpaperImageType.jpg.index],
+        isOfficial = map["isOfficial"] ?? false,
         headers = map["headers"] ?? {} {
     logoSource = map["logoSource"] ??
         "https://avatars.dicebear.com/api/identicon/$name.png";
@@ -48,6 +51,7 @@ class WallpaperSource {
       "imageType": imageType.index,
       "headers": headers,
       "logoSource": logoSource,
+      "isOfficial": isOfficial,
     };
   }
 }

@@ -30,7 +30,9 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
 
     final nameController =
         useTextEditingController(text: wallpaperSource?.name);
-    final urlController = useTextEditingController(text: wallpaperSource?.url);
+    final urlController = useTextEditingController(
+      text: wallpaperSource?.isOfficial == true ? null : wallpaperSource?.url,
+    );
     final jsonAccessorController =
         useTextEditingController(text: wallpaperSource?.jsonAccessor);
 
@@ -38,8 +40,16 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
         () => wallpaperSource?.id ?? uuid.v4(), [wallpaperSource?.id]);
 
     final logo = useState<String?>(null);
-
-    final headers = useState<List<Map<String, String>>>([]);
+    final headers = useState<List<Map<String, String>>>(
+      wallpaperSource?.headers.entries.map((e) {
+            return Map.castFrom<String, dynamic, String, String>({
+              "id": uuid.v4(),
+              "name": e.key,
+              "value": wallpaperSource?.isOfficial == true ? "" : e.value,
+            });
+          }).toList() ??
+          [],
+    );
 
     saveIcon() async {
       final logoXFile = await imagePicker.pickImage(
@@ -207,6 +217,7 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
                       onPressed: () {
                         if (formKey.currentState?.validate() ?? false) {
                           final source = WallpaperSource(
+                            isOfficial: false,
                             id: id,
                             jsonAccessor: jsonAccessorController.value.text,
                             name: nameController.value.text,
