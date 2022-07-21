@@ -15,6 +15,7 @@ Your own Wallpaper Manager for Android. It randomly sets a wallpaper from the se
 ## Install
 
 Download & install Android APK
+<br/>
 [<img width='240' alt='Android Download' src='https://www.remcsteuben.com/sites/default/files/images/apkdaddy%20download.png'/>](https://github.com/KRTirtho/wallywiz/releases/latest/download/wallywiz-all-arch.apk)
 
 
