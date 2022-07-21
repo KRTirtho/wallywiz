@@ -37,6 +37,13 @@ class WallpaperSupplierView extends HookConsumerWidget {
     final hourController = useTextEditingController(text: "");
     final minuteController = useTextEditingController(text: "");
 
+    const whiteText = TextStyle(color: Colors.white);
+    const whiteOutlineInputBorder = OutlineInputBorder(
+      borderSide: BorderSide(
+        color: Colors.white,
+        width: 1,
+      ),
+    );
     return Stack(
       children: [
         if (bgWallpaperSnapshot.asData?.value != null)
@@ -57,6 +64,7 @@ class WallpaperSupplierView extends HookConsumerWidget {
             backgroundColor: Theme.of(context).backgroundColor.withOpacity(.2),
             appBar: AppBar(
               backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
               title: Text(wallpaperSource.name),
               actions: [
                 IconButton(
@@ -121,7 +129,10 @@ class WallpaperSupplierView extends HookConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(children: [
-                    const Text("Wallpaper change interval"),
+                    const Text(
+                      "Wallpaper change interval",
+                      style: TextStyle(color: Colors.white),
+                    ),
                     const SizedBox(height: 10),
                     Form(
                       key: formKey,
@@ -136,6 +147,9 @@ class WallpaperSupplierView extends HookConsumerWidget {
                               keyboardType: TextInputType.number,
                               controller: hourController,
                               decoration: const InputDecoration(
+                                enabledBorder: whiteOutlineInputBorder,
+                                labelStyle: whiteText,
+                                hintStyle: whiteText,
                                 label: Text("Hour"),
                                 hintText: "between 0 to 23",
                               ),
@@ -151,6 +165,9 @@ class WallpaperSupplierView extends HookConsumerWidget {
                               keyboardType: TextInputType.number,
                               controller: minuteController,
                               decoration: const InputDecoration(
+                                enabledBorder: whiteOutlineInputBorder,
+                                labelStyle: whiteText,
+                                hintStyle: whiteText,
                                 label: Text("Minute"),
                                 hintText: "between 0 to 59",
                               ),

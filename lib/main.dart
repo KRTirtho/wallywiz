@@ -109,13 +109,19 @@ class MyApp extends HookConsumerWidget {
   Widget build(BuildContext context, ref) {
     final preferences = ref.watch(userPreferencesProvider);
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'WallyWiz',
       themeMode: preferences.themeMode,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        primarySwatch: Colors.grey,
         scaffoldBackgroundColor: Colors.white,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            onPrimary: Colors.grey[700],
+          ),
+        ),
         inputDecorationTheme: const InputDecorationTheme(
             contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             enabledBorder: OutlineInputBorder(
@@ -130,7 +136,16 @@ class MyApp extends HookConsumerWidget {
               borderSide: BorderSide(color: Colors.red, width: 2),
             )),
       ),
-      darkTheme: ThemeData.dark().copyWith(
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(
+          backgroundColor: Colors.grey[900],
+          brightness: Brightness.dark,
+          accentColor: Colors.grey,
+          errorColor: Colors.red,
+          primaryColorDark: Colors.grey,
+          primarySwatch: Colors.grey,
+          cardColor: Colors.grey[850],
+        ),
         useMaterial3: true,
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.grey[900],

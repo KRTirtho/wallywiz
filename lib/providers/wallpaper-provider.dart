@@ -144,22 +144,28 @@ final wallpaperProvider = ChangeNotifierProvider(
             name: "Nasa",
             url: "https://api.nasa.gov/planetary/apod?api_key=$nasaKey",
             isOfficial: true,
+            logoSource:
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/2449px-NASA_logo.svg.png",
           ),
           WallpaperSource(
             id: uuid.v4(),
             jsonAccessor: "url",
             name: "Bing",
             url: "https://bing.biturl.top",
+            logoSource:
+                "https://cdn.vox-cdn.com/thumbor/wBRCdEaZtpAd2bJBlOhtRC6euVk=/1400x1050/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/21937385/binglogo.jpg",
             isOfficial: true,
           ),
           WallpaperSource(
-              isOfficial: true,
-              id: uuid.v4(),
-              name: "Unsplash",
-              url:
-                  "https://api.unsplash.com/photos/random?orientation=portrait",
-              jsonAccessor: "urls.full",
-              headers: {"Authorization": "Client-ID $unsplashKey"}),
+            isOfficial: true,
+            id: uuid.v4(),
+            name: "Unsplash",
+            url: "https://api.unsplash.com/photos/random?orientation=portrait",
+            jsonAccessor: "urls.full",
+            headers: {"Authorization": "Client-ID $unsplashKey"},
+            logoSource:
+                "https://www.insightplatforms.com/wp-content/uploads/2021/03/Unsplash-Logo-Square-Insight-Platforms.png",
+          ),
           WallpaperSource(
             id: uuid.v4(),
             isOfficial: true,
@@ -167,6 +173,8 @@ final wallpaperProvider = ChangeNotifierProvider(
             url: "https://api.pexels.com/v1/curated",
             headers: {"Authorization": pexelKey},
             jsonAccessor: "photos.\$.src.portrait",
+            logoSource:
+                "https://i.pinimg.com/564x/4a/45/76/4a4576e56a3ebf1a512aa38ce211dc93.jpg",
           ),
           WallpaperSource(
             id: uuid.v4(),
@@ -175,6 +183,8 @@ final wallpaperProvider = ChangeNotifierProvider(
             url:
                 "https://pixabay.com/api?key=$pixabayKey&image_type=photo&orientation=vertical&safesearch=true&order=popular",
             jsonAccessor: "hits.\$.largeImageURL",
+            logoSource:
+                "https://cdn.pixabay.com/photo/2020/05/01/09/00/pixabay-5115964_960_720.png",
           ),
         ]);
   },

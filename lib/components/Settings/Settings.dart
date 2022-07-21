@@ -17,34 +17,49 @@ class Settings extends ConsumerWidget {
       ),
       body: ListView(
         children: [
-          SettingsTile(
-            title: "Wallpaper Change Location",
-            trailing: DropdownButton<int>(
-              items: [
-                DropdownMenuItem(
-                  child: const Text(
-                    "Home Screen Only",
-                  ),
-                  value: WallpaperManager.HOME_SCREEN,
-                ),
-                DropdownMenuItem(
-                  child: const Text(
-                    "Lock Screen Only",
-                  ),
-                  value: WallpaperManager.LOCK_SCREEN,
-                ),
-                DropdownMenuItem(
-                  child: const Text("Both Lock & Home Screen"),
-                  value: WallpaperManager.BOTH_SCREEN,
-                ),
-              ],
-              value: preferences.wallpaperLocation,
-              onChanged: (value) {
-                if (value != null) {
-                  preferences.setWallpaperLocation(value);
-                }
-              },
-            ),
+          ListTile(
+            title: const Text("Wallpaper Change Location"),
+            onTap: () async {
+              final value = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    title: const Text("Wallpaper Change Location"),
+                    children: [
+                      SimpleDialogOption(
+                        child: const Text("Lock Screen"),
+                        onPressed: () {
+                          Navigator.pop(
+                            context,
+                            WallpaperManager.LOCK_SCREEN,
+                          );
+                        },
+                      ),
+                      SimpleDialogOption(
+                        child: const Text("Home Screen"),
+                        onPressed: () {
+                          Navigator.pop(
+                            context,
+                            WallpaperManager.HOME_SCREEN,
+                          );
+                        },
+                      ),
+                      SimpleDialogOption(
+                        child: const Text("Both Home & Lock Screen"),
+                        onPressed: () {
+                          Navigator.pop(
+                            context,
+                            WallpaperManager.BOTH_SCREEN,
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+              if (value == null) return;
+              preferences.setWallpaperLocation(value);
+            },
           ),
           SettingsTile(
             title: "Theme",
@@ -52,15 +67,11 @@ class Settings extends ConsumerWidget {
               value: preferences.themeMode,
               items: const [
                 DropdownMenuItem(
-                  child: Text(
-                    "Dark",
-                  ),
+                  child: Text("Dark"),
                   value: ThemeMode.dark,
                 ),
                 DropdownMenuItem(
-                  child: Text(
-                    "Light",
-                  ),
+                  child: Text("Light"),
                   value: ThemeMode.light,
                 ),
                 DropdownMenuItem(

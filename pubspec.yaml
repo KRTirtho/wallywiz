@@ -54,6 +54,7 @@ dependencies:
   marquee: ^2.2.3
   image_picker: ^0.8.5+3
   image_picker_android: ^0.8.5+1
+  flutter_svg: ^1.1.1+1
 
 dev_dependencies:
   flutter_test:
@@ -68,7 +69,7 @@ dev_dependencies:
 
 flutter_icons:
   android: "launcher_icon"
-  image_path: "assets/wallywiz-logo.jpg"
+  image_path: "assets/logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
