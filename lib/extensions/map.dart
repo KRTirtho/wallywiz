@@ -7,7 +7,7 @@ extension StringSelector<T, R> on Map<T, R> {
     selector.split(".").forEachIndexed((index, key) {
       if (index == 0 && containsKey(key)) {
         result = this[key];
-      } else if (result is List) {
+      } else if (result is List && result.isNotEmpty) {
         final keyAsInt = int.tryParse(key);
         if (keyAsInt != null && result[keyAsInt] != null) {
           result = result[keyAsInt];

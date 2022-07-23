@@ -83,7 +83,7 @@ void callbackDispatcher() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid) {
-    await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+    await Workmanager().initialize(callbackDispatcher);
   }
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -92,15 +92,6 @@ void main() async {
 const WALLPAPER_TASK_NAME = "wallpaper-change-task";
 // ignore: constant_identifier_names
 const WALLPAPER_TASK_UNIQUE_NAME = "wallpaper-change-task";
-// list of wallpaper sources
-// - unsplash
-// - pexels
-// - dicebear
-// - pixabay
-// - flickr
-// - NASA picture of the day
-// - Bing picture of the day (https://bing.biturl.top)
-// - Anime wallpaper grabber
 
 class MyApp extends HookConsumerWidget {
   const MyApp({Key? key}) : super(key: key);

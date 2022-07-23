@@ -123,7 +123,9 @@ class WallpaperSupplierView extends HookConsumerWidget {
                       );
                     },
                     error: (error, stack) => throw error,
-                    loading: () => const CircularProgressIndicator.adaptive(),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
                   );
                 }),
                 Padding(

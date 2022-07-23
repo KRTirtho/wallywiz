@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/HeaderDialog.dart';
+import 'package:wallywiz/components/CreateWallpaperProvider/JsonPropertyPicker.dart';
 import 'package:wallywiz/components/shared/MarqueeText.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
@@ -90,32 +91,34 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
           child: ListView(
             shrinkWrap: true,
             children: [
-              Center(
-                child: Column(
-                  children: [
-                    IconButton(
-                      icon: wallpaperSource?.logoSource == null &&
-                              logo.value == null
-                          ? const Icon(Icons.add_photo_alternate)
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(5),
-                              child: Image.file(
-                                File(
-                                  logo.value ?? wallpaperSource!.logoSource,
+              if (wallpaperSource?.isOfficial != true)
+                Center(
+                  child: Column(
+                    children: [
+                      IconButton(
+                        icon: wallpaperSource?.logoSource == null &&
+                                logo.value == null
+                            ? const Icon(Icons.add_photo_alternate)
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: Image.file(
+                                  File(
+                                    logo.value ?? wallpaperSource!.logoSource,
+                                  ),
                                 ),
                               ),
-                            ),
-                      iconSize: wallpaperSource?.logoSource == null ? 70 : 100,
-                      onPressed: saveIcon,
-                    ),
-                    Text(
-                      "Logo",
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    const SizedBox(height: 20)
-                  ],
+                        iconSize:
+                            wallpaperSource?.logoSource == null ? 70 : 100,
+                        onPressed: saveIcon,
+                      ),
+                      Text(
+                        "Logo",
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      const SizedBox(height: 20)
+                    ],
+                  ),
                 ),
-              ),
               TextFormField(
                 controller: nameController,
                 validator:
@@ -199,14 +202,51 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
               const SizedBox(height: 10),
               const Divider(),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: jsonAccessorController,
-                validator:
-                    ValidationBuilder().required("URL is required").build(),
-                decoration: const InputDecoration(
-                  hintText: "e.g. data.photo",
-                  labelText: "JSON property accessor",
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: jsonAccessorController,
+                      validator: ValidationBuilder()
+                          .required("URL is required")
+                          .build(),
+                      decoration: const InputDecoration(
+                        hintText: "e.g. data.photo",
+                        labelText: "JSON property accessor",
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.padding_outlined),
+                    onPressed: () async {
+                      final url = wallpaperSource?.isOfficial == true
+                          ? wallpaperSource!.url
+                          : urlController.value.text;
+                      if (url.isNotEmpty &&
+                          Uri.tryParse(url)?.hasAbsolutePath == true) {
+                        final result = await showDialog(
+                          context: context,
+                          builder: (context) => JsonPropertyPicker(
+                            url: url,
+                            headers: wallpaperSource?.isOfficial == true
+                                ? wallpaperSource!.headers
+                                : headers.value.fold(
+                                    {},
+                                    (acc, val) {
+                                      acc[val["name"] as String] = val["value"];
+                                      return acc;
+                                    },
+                                  ),
+                          ),
+                        );
+                        if (result == null) return;
+                        jsonAccessorController.text = result;
+                      } else {
+                        formKey.currentState?.validate();
+                      }
+                    },
+                  )
+                ],
               ),
               const SizedBox(height: 10),
               Row(
