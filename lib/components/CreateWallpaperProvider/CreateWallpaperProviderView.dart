@@ -101,11 +101,17 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
                             ? const Icon(Icons.add_photo_alternate)
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(5),
-                                child: Image.file(
-                                  File(
-                                    logo.value ?? wallpaperSource!.logoSource,
-                                  ),
-                                ),
+                                child: wallpaperSource!.logoSource
+                                        .startsWith("http")
+                                    ? Image.network(
+                                        wallpaperSource!.logoSource,
+                                      )
+                                    : Image.file(
+                                        File(
+                                          logo.value ??
+                                              wallpaperSource!.logoSource,
+                                        ),
+                                      ),
                               ),
                         iconSize:
                             wallpaperSource?.logoSource == null ? 70 : 100,

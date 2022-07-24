@@ -31,7 +31,7 @@ class JsonPropertyPicker extends HookWidget {
             else
               ...snapshot.data!.first.map((path) {
                 final value =
-                    (snapshot.data!.last as Map).getNestedProperty(path);
+                    Map.from(snapshot.data!.last).getNestedProperty(path);
                 if (value is String &&
                     Uri.tryParse(value)?.hasAbsolutePath == true &&
                     value.startsWith("http")) {

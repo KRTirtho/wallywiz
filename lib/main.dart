@@ -12,7 +12,10 @@ import 'package:uuid/uuid.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/services/logger.dart';
 import 'package:path/path.dart' as path;
+// ignore: unused_import
 import 'package:wallywiz/extensions/map.dart';
+// ignore: unused_import
+import 'package:wallywiz/extensions/list.dart';
 
 void callbackDispatcher() {
   Workmanager().executeTask(
@@ -40,7 +43,7 @@ void callbackDispatcher() {
               responseType: ResponseType.json,
             ),
           ))
-              .data as Map?;
+              .data;
           if (res == null) return false;
           final String url = res.getNestedProperty(source.jsonAccessor);
           logger.v("[Next Wallpaper] $url");

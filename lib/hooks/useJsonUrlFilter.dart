@@ -51,8 +51,20 @@ AsyncSnapshot<List> useJsonUrlFilter(String url, Map headers) {
   return useFuture(
     useMemoized(
       () => dio
-          .get(url, options: Options(headers: Map.castFrom(headers)))
-          .then((data) => [filter(data.data), data.data]),
+          .get(url,
+              options: Options(
+                headers: Map.castFrom(headers),
+                responseType: ResponseType.json,
+              ))
+          .then((data) {
+        if (data.data is List) {
+          return [
+            filter(data.data).map((s) => "data.$s").toList(),
+            {"data": data.data}
+          ];
+        }
+        return [filter(data.data), data.data];
+      }),
       [url],
     ),
   );
