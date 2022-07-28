@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
+// ignore: unused_import
 import 'package:wallywiz/extensions/map.dart';
+// ignore: unused_import
+import 'package:wallywiz/extensions/list.dart';
 
 final dio = Dio(BaseOptions(responseType: ResponseType.json));
 final wallpaperQuery = FutureProvider.family<Map, String>(
@@ -15,9 +18,11 @@ final wallpaperQuery = FutureProvider.family<Map, String>(
         headers: source.headers,
       ),
     ))
-        .data as Map;
+        .data;
 
-    final imageURL = res.getNestedProperty(source.jsonAccessor);
+    final imageURL = res is Map
+        ? Map.from(res).getNestedProperty(source.jsonAccessor)
+        : List.from(res).getNestedProperty(source.jsonAccessor);
 
     return {"response": res, "image": imageURL};
   },

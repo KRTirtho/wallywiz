@@ -45,7 +45,9 @@ void callbackDispatcher() {
           ))
               .data;
           if (res == null) return false;
-          final String url = res.getNestedProperty(source.jsonAccessor);
+          final String url = res is Map
+              ? Map.from(res).getNestedProperty(source.jsonAccessor)
+              : List.from(res).getNestedProperty(source.jsonAccessor);
           logger.v("[Next Wallpaper] $url");
           print("[Next Wallpaper] $url");
 
