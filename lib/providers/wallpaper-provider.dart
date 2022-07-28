@@ -46,6 +46,15 @@ class _WallpaperProvider extends PersistedChangeNotifier {
     updatePersistence();
   }
 
+  void addWallpaperSources(List<WallpaperSource> rawSources) {
+    final sources = rawSources.where((source) {
+      return wallpaperSources.none((s) => s.id == source.id);
+    });
+    wallpaperSources = [...wallpaperSources, ...sources];
+    notifyListeners();
+    updatePersistence();
+  }
+
   void updateWallpaperSource(String id, WallpaperSource source) {
     if (wallpaperSources.none((element) => element.id == source.id)) return;
 
