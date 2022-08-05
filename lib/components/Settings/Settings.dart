@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
@@ -13,6 +16,22 @@ import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+const license = """
+BSD-4-Clause License
+
+Copyright (c) 2022 Kingkor Roy Tirtho. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+3. All advertising materials mentioning features or use of this software must display the following acknowledgement:
+This product includes software developed by Kingkor Roy Tirtho.
+4. Neither the name of the Software nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY KINGKOR ROY TIRTHO AND CONTRIBUTORS  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL KINGKOR ROY TIRTHO AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+""";
 
 class Settings extends ConsumerWidget {
   const Settings({Key? key}) : super(key: key);
@@ -200,6 +219,89 @@ class Settings extends ConsumerWidget {
               ));
             },
           ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 7),
+            decoration: BoxDecoration(
+              color: Colors.pink[100],
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                iconColor: Colors.pink,
+                textColor: Colors.pink,
+                title: const Text(
+                  "Support Us",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: const Icon(Icons.favorite_border_rounded),
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Support WallyWiz 💖"),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    launchUrl(
+                                      Uri.parse(
+                                          "https://www.buymeacoffee.com/krtirtho"),
+                                      mode: LaunchMode.externalApplication,
+                                    );
+                                  },
+                                  child: SvgPicture.network(
+                                    "https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=krtirtho&button_colour=FF5F5F&font_colour=ffffff&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00",
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    launchUrl(
+                                      Uri.parse("https://patreon.com/krtirtho"),
+                                      mode: LaunchMode.externalApplication,
+                                    );
+                                  },
+                                  child: CachedNetworkImage(
+                                    imageUrl:
+                                        "https://user-images.githubusercontent.com/61944859/180249027-678b01b8-c336-451e-b147-6d84a5b9d0e7.png",
+                                    width: 230,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      });
+                },
+              ),
+            ),
+          ),
+          ListTile(
+              title: const Text("About WallyWiz"),
+              onTap: () async {
+                final packageInfo = await PackageInfo.fromPlatform();
+                showAboutDialog(
+                  context: context,
+                  applicationIcon: SvgPicture.asset(
+                    "assets/logo.svg",
+                    width: 100,
+                    height: 100,
+                  ),
+                  applicationLegalese: license,
+                  applicationName: "WallyWiz",
+                  applicationVersion: packageInfo.version,
+                );
+              }),
         ],
       ),
     );
