@@ -31,7 +31,9 @@ You can set/edit your own custom wallpaper provider API. Just go to tap on the F
 
 Optionally, you can also set a Logo for the item too
 
+But the biggest highlight is that you can **pick image url property from JSON** which makes it really easy to set a custom wallpaper API.
 ![Screenshot-3](/assets/screenshot-3.png)
+![Screenshot-3](/assets/screenshot-4.png)
 
 ## License
 
