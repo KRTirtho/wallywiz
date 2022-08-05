@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wallywiz/components/Settings/SettingsTile.dart';
 import 'package:wallywiz/models/ConfigurationSchema.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
@@ -49,6 +50,7 @@ class Settings extends ConsumerWidget {
         children: [
           ListTile(
             title: const Text("Wallpaper Change Location"),
+            leading: const Icon(Icons.wallpaper),
             onTap: () async {
               final value = await showDialog(
                 context: context,
@@ -93,6 +95,7 @@ class Settings extends ConsumerWidget {
           ),
           SettingsTile(
             title: "Theme",
+            leading: const Icon(Icons.format_paint_rounded),
             trailing: DropdownButton<ThemeMode>(
               value: preferences.themeMode,
               items: const [
@@ -124,12 +127,17 @@ class Settings extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
+            leading: const Icon(
+              Icons.stop_circle_outlined,
+              color: Colors.red,
+            ),
             onTap: () async {
               await Workmanager().cancelAll();
             },
           ),
           ListTile(
             title: const Text("Import Configurations"),
+            leading: const Icon(Icons.file_download_outlined),
             onTap: () async {
               final file = File(
                 await FilePicker.platform
@@ -183,6 +191,7 @@ class Settings extends ConsumerWidget {
           ),
           ListTile(
             title: const Text("Export Configurations"),
+            leading: const Icon(Icons.file_upload_outlined),
             subtitle: const Text(
               "Exports all credentials & API keys too",
             ),
@@ -219,8 +228,17 @@ class Settings extends ConsumerWidget {
               ));
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.bug_report_rounded),
+            title: const Text("Report bugs/issues"),
+            onTap: () {
+              launchUrlString(
+                "https://github.com/KRTirtho/wallywiz/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
+              );
+            },
+          ),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 7),
+            margin: const EdgeInsets.symmetric(horizontal: 7),
             decoration: BoxDecoration(
               color: Colors.pink[100],
               borderRadius: BorderRadius.circular(4),
@@ -236,7 +254,7 @@ class Settings extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                trailing: const Icon(Icons.favorite_border_rounded),
+                leading: const Icon(Icons.favorite_border_rounded),
                 onTap: () {
                   showDialog(
                       context: context,
@@ -288,6 +306,7 @@ class Settings extends ConsumerWidget {
           ),
           ListTile(
               title: const Text("About WallyWiz"),
+              leading: const Icon(Icons.info_outline_rounded),
               onTap: () async {
                 final packageInfo = await PackageInfo.fromPlatform();
                 showAboutDialog(

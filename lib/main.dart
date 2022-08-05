@@ -118,6 +118,7 @@ class MyApp extends HookConsumerWidget {
             onPrimary: Colors.grey[700],
           ),
         ),
+        listTileTheme: const ListTileThemeData(horizontalTitleGap: 0),
         inputDecorationTheme: const InputDecorationTheme(
             contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             enabledBorder: OutlineInputBorder(
