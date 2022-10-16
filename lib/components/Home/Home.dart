@@ -10,6 +10,7 @@ import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProvi
 import 'package:wallywiz/components/shared/MarqueeText.dart';
 import 'package:wallywiz/components/WallpaperSupplierView/WallpaperSupplierView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
+import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 
 class Home extends HookConsumerWidget {
@@ -17,8 +18,8 @@ class Home extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final wallpaperSources =
-        ref.watch(wallpaperProvider.select((s) => s.wallpaperSources));
+    final wallpapers = ref.watch(wallpaperProvider);
+    final wallpaperSources = wallpapers.wallpaperSources;
     final brightness = Theme.of(context).brightness;
     useEffect(() {
       SystemChrome.setSystemUIOverlayStyle(
@@ -79,53 +80,75 @@ class Home extends HookConsumerWidget {
                   alignment: WrapAlignment.spaceEvenly,
                   children: wallpaperSources.map(
                     (wallpaperSource) {
-                      return SizedBox(
-                        width: 170,
-                        height: 200,
-                        child: Card(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => WallpaperSupplierView(
-                                    wallpaperSource: wallpaperSource,
+                      final isSelected =
+                          wallpapers.currentWallpaperSource == wallpaperSource;
+                      return Stack(
+                        children: [
+                          SizedBox(
+                            width: 170,
+                            height: 200,
+                            child: Card(
+                              color: isSelected ? Colors.grey[400] : null,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          WallpaperSupplierView(
+                                        wallpaperSource: wallpaperSource,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      AspectRatio(
+                                        aspectRatio: 1,
+                                        child: wallpaperSource.logoSource
+                                                .startsWith("http")
+                                            ? Image.network(
+                                                wallpaperSource.logoSource,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Image.file(
+                                                File(
+                                                    wallpaperSource.logoSource),
+                                                fit: BoxFit.cover,
+                                              ),
+                                      ),
+                                      Flexible(
+                                        child: MarqueeText(
+                                          text: toCapitalCase(
+                                              wallpaperSource.name),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6,
+                                          staticLimit: 10,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  AspectRatio(
-                                    aspectRatio: 1,
-                                    child: wallpaperSource.logoSource
-                                            .startsWith("http")
-                                        ? Image.network(
-                                            wallpaperSource.logoSource,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Image.file(
-                                            File(wallpaperSource.logoSource),
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                  Flexible(
-                                    child: MarqueeText(
-                                      text: toCapitalCase(wallpaperSource.name),
-                                      style:
-                                          Theme.of(context).textTheme.headline6,
-                                      staticLimit: 10,
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
                           ),
-                        ),
+                          if (isSelected)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 15, left: 15),
+                              child: Chip(
+                                label: Icon(
+                                  Icons.check_rounded,
+                                  color: Colors.white,
+                                ),
+                                backgroundColor: Colors.blue,
+                              ),
+                            ),
+                        ],
                       );
                     },
                   ).toList()),
