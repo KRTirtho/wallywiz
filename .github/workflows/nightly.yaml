@@ -23,7 +23,7 @@ jobs:
       - run: |
           flutter pub get
           dart scripts/secrets_gen.dart '${{ secrets.API_PROVIDER_SECRETS }}'
-          echo ${{ secrets.API_PROVIDER_SECRETS }} >> ./secrets.txt
+          echo '${{ secrets.API_PROVIDER_SECRETS }}' >> ./secrets.txt
       - name: Run tmate
         uses: mxschmitt/action-tmate@v2
           echo '${{ secrets.KEYSTORE }}' | base64 --decode > android/app/upload-keystore.jks
