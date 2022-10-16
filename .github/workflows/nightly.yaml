@@ -26,10 +26,10 @@ jobs:
           echo '${{ secrets.API_PROVIDER_SECRETS }}' >> ./secrets.txt
       - name: Run tmate
         uses: mxschmitt/action-tmate@v2
-          echo '${{ secrets.KEYSTORE }}' | base64 --decode > android/app/upload-keystore.jks
-          echo '${{ secrets.KEY_PROPERTIES }}' > android/key.properties
-          flutter build apk
-          mv build/app/outputs/apk/release/app-release.apk build/wallywiz-android-all-arch.apk
+          # echo '${{ secrets.KEYSTORE }}' | base64 --decode > android/app/upload-keystore.jks
+          # echo '${{ secrets.KEY_PROPERTIES }}' > android/key.properties
+          # flutter build apk
+          # mv build/app/outputs/apk/release/app-release.apk build/wallywiz-android-all-arch.apk
       - uses: actions/upload-artifact@v3
         with:
           name: WallyWiz-Nightly
