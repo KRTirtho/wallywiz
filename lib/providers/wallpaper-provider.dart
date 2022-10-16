@@ -19,6 +19,7 @@ enum RandomWallpaperAPI {
   bing,
   pexels,
   pixabay,
+  wallhaven,
 }
 
 class _WallpaperProvider extends PersistedChangeNotifier {
@@ -194,6 +195,16 @@ final wallpaperProvider = ChangeNotifierProvider(
             jsonAccessor: "hits.\$.largeImageURL",
             logoSource:
                 "https://cdn.pixabay.com/photo/2020/05/01/09/00/pixabay-5115964_960_720.png",
+          ),
+          WallpaperSource(
+            id: uuid.v4(),
+            isOfficial: true,
+            name: "Wallhaven",
+            url:
+                "https://wallhaven.cc/api/v1/search?apiKey=$wallhavenKey&categories=100&sorting=views",
+            jsonAccessor: "data.\$.path",
+            logoSource:
+                "https://repository-images.githubusercontent.com/190798434/716a9200-89e0-11e9-9a91-8bda5b8845a0",
           ),
         ]);
   },

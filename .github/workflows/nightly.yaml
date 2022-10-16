@@ -15,21 +15,13 @@ jobs:
       - run: |
           sudo apt-get update -y
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev make python3-pip python3-setuptools patchelf desktop-file-utils libgdk-pixbuf2.0-dev fakeroot strace fuse
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-        with:
-          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
-          limit-access-to-actor: true
       - run: |
           flutter pub get
           dart scripts/secrets_gen.dart '${{ secrets.API_PROVIDER_SECRETS }}'
-          echo '${{ secrets.API_PROVIDER_SECRETS }}' >> ./secrets.txt
-      - name: Run tmate
-        uses: mxschmitt/action-tmate@v2
-          # echo '${{ secrets.KEYSTORE }}' | base64 --decode > android/app/upload-keystore.jks
-          # echo '${{ secrets.KEY_PROPERTIES }}' > android/key.properties
-          # flutter build apk
-          # mv build/app/outputs/apk/release/app-release.apk build/wallywiz-android-all-arch.apk
+          echo '${{ secrets.KEYSTORE }}' | base64 --decode > android/app/upload-keystore.jks
+          echo '${{ secrets.KEY_PROPERTIES }}' > android/key.properties
+          flutter build apk
+          mv build/app/outputs/apk/release/app-release.apk build/wallywiz-android-all-arch.apk
       - uses: actions/upload-artifact@v3
         with:
           name: WallyWiz-Nightly
