@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:duration/duration.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
 import 'package:wallywiz/helpers/PersistedChangeNotifier.dart';
 import 'package:wallywiz/main.dart';
@@ -95,6 +96,15 @@ class _WallpaperProvider extends PersistedChangeNotifier {
     );
     updatePersistence();
     notifyListeners();
+  }
+
+  void refreshWallpaper() async {
+    await Workmanager().cancelAll();
+    scheduleWallpaperChanger(
+      tempDir: (await getTemporaryDirectory()).path,
+      source: currentWallpaperSource!,
+      period: schedule,
+    );
   }
 
   void setCurrentWallpaperSource(WallpaperSource source) {

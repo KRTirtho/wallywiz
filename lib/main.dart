@@ -12,9 +12,7 @@ import 'package:uuid/uuid.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/services/logger.dart';
 import 'package:path/path.dart' as path;
-// ignore: unused_import
 import 'package:wallywiz/extensions/map.dart';
-// ignore: unused_import
 import 'package:wallywiz/extensions/list.dart';
 
 void callbackDispatcher() {
@@ -115,7 +113,7 @@ class MyApp extends HookConsumerWidget {
         scaffoldBackgroundColor: Colors.white,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            onPrimary: Colors.grey[700],
+            foregroundColor: Colors.grey[700],
           ),
         ),
         listTileTheme: const ListTileThemeData(horizontalTitleGap: 0),

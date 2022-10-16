@@ -10,7 +10,6 @@ import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProvi
 import 'package:wallywiz/components/shared/MarqueeText.dart';
 import 'package:wallywiz/components/WallpaperSupplierView/WallpaperSupplierView.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
-import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 
 class Home extends HookConsumerWidget {
@@ -49,6 +48,13 @@ class Home extends HookConsumerWidget {
           title: const Text("WallyWiz"),
           centerTitle: false,
           actions: [
+            IconButton(
+              icon: const Icon(Icons.restart_alt_rounded),
+              tooltip: "Refresh Wallpaper now!",
+              onPressed: () {
+                wallpapers.refreshWallpaper();
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.settings_outlined),
               onPressed: () {
