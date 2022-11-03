@@ -15,6 +15,7 @@ import 'package:path/path.dart' as path;
 import 'package:wallywiz/extensions/map.dart';
 import 'package:wallywiz/extensions/list.dart';
 
+@pragma("vm:entry-point")
 void callbackDispatcher() {
   Workmanager().executeTask(
     (taskName, inputData) async {
