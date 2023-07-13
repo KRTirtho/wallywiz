@@ -1,6 +1,6 @@
-import 'package:json_schema2/json_schema2.dart';
+import 'package:json_schema2/json_schema.dart';
 
-final configurationSchema = JsonSchema.createSchema({
+final configurationSchema = JsonSchema.create({
   r"$schema": "http://json-schema.org/draft-04/schema#",
   "type": "array",
   "items": [

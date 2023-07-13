@@ -150,12 +150,12 @@ class Settings extends ConsumerWidget {
                     .then((s) => s!.paths.single!),
               );
 
-              final errors = configurationSchema.validateWithErrors(
+              final validation = configurationSchema.validate(
                 file.readAsStringSync(),
                 parseJson: true,
               );
 
-              if (errors.isNotEmpty) {
+              if (validation.errors.isNotEmpty) {
                 return showDialog(
                   context: context,
                   builder: (context) {
@@ -167,9 +167,10 @@ class Settings extends ConsumerWidget {
                         width: MediaQuery.of(context).size.width,
                         child: ListView.builder(
                           shrinkWrap: true,
-                          itemCount: errors.length,
+                          itemCount: validation.errors.length,
                           itemBuilder: (context, index) {
-                            return Text(errors.elementAt(index).message);
+                            return Text(
+                                validation.errors.elementAt(index).message);
                           },
                         ),
                       ),

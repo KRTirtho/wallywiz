@@ -4,12 +4,12 @@ import 'dart:convert';
 import 'package:duration/duration.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:wallywiz/collections/env.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
 import 'package:wallywiz/helpers/PersistedChangeNotifier.dart';
 import 'package:wallywiz/main.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/preferences.dart';
-import 'package:wallywiz/secrets.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:collection/collection.dart';
 
@@ -150,7 +150,7 @@ class _WallpaperProvider extends PersistedChangeNotifier {
   }
 }
 
-final wallpaperProvider = ChangeNotifierProvider(
+final wallpaperProvider = ChangeNotifierProvider<_WallpaperProvider>(
   (ref) {
     return _WallpaperProvider(
         ref: ref,
@@ -162,7 +162,7 @@ final wallpaperProvider = ChangeNotifierProvider(
             id: uuid.v4(),
             jsonAccessor: "hdurl",
             name: "Nasa",
-            url: "https://api.nasa.gov/planetary/apod?api_key=$nasaKey",
+            url: "https://api.nasa.gov/planetary/apod?api_key=${Env.nasaKey}",
             isOfficial: true,
             logoSource:
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/2449px-NASA_logo.svg.png",
@@ -182,7 +182,7 @@ final wallpaperProvider = ChangeNotifierProvider(
             name: "Unsplash",
             url: "https://api.unsplash.com/photos/random?orientation=portrait",
             jsonAccessor: "urls.full",
-            headers: {"Authorization": "Client-ID $unsplashKey"},
+            headers: {"Authorization": "Client-ID ${Env.unsplashKey}"},
             logoSource:
                 "https://www.insightplatforms.com/wp-content/uploads/2021/03/Unsplash-Logo-Square-Insight-Platforms.png",
           ),
@@ -191,7 +191,7 @@ final wallpaperProvider = ChangeNotifierProvider(
             isOfficial: true,
             name: "Pexels",
             url: "https://api.pexels.com/v1/curated",
-            headers: {"Authorization": pexelKey},
+            headers: {"Authorization": Env.pexelKey},
             jsonAccessor: "photos.\$.src.portrait",
             logoSource:
                 "https://i.pinimg.com/564x/4a/45/76/4a4576e56a3ebf1a512aa38ce211dc93.jpg",
@@ -201,7 +201,7 @@ final wallpaperProvider = ChangeNotifierProvider(
             isOfficial: true,
             name: "Pixabay",
             url:
-                "https://pixabay.com/api?key=$pixabayKey&image_type=photo&orientation=vertical&safesearch=true&order=popular",
+                "https://pixabay.com/api?key=${Env.pixabayKey}&image_type=photo&orientation=vertical&safesearch=true&order=popular",
             jsonAccessor: "hits.\$.largeImageURL",
             logoSource:
                 "https://cdn.pixabay.com/photo/2020/05/01/09/00/pixabay-5115964_960_720.png",
@@ -211,7 +211,7 @@ final wallpaperProvider = ChangeNotifierProvider(
             isOfficial: true,
             name: "Wallhaven",
             url:
-                "https://wallhaven.cc/api/v1/search?apiKey=$wallhavenKey&categories=100&sorting=views",
+                "https://wallhaven.cc/api/v1/search?apiKey=${Env.wallHavenKey}&categories=100&sorting=views",
             jsonAccessor: "data.\$.path",
             logoSource:
                 "https://repository-images.githubusercontent.com/190798434/716a9200-89e0-11e9-9a91-8bda5b8845a0",

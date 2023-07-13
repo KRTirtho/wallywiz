@@ -22,8 +22,8 @@ void callbackDispatcher() {
       final logInstance = WallyWizLogger();
       final dio = Dio(BaseOptions(
         responseType: ResponseType.bytes,
-        sendTimeout: 60 * 1000, // 1 minute
-        receiveTimeout: 3 * 60 * 1000, // 3 minutes
+        sendTimeout: const Duration(minutes: 1),
+        receiveTimeout: const Duration(minutes: 3), // 3 minutes
       ));
       const uuid = Uuid();
       final logger = logInstance..owner = "BackgroundService -> schedule";
