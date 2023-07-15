@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:desktop_wallpaper/desktop_wallpaper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Home/Home.dart';
@@ -16,6 +17,7 @@ import 'package:wallywiz/services/logger.dart';
 import 'package:path/path.dart' as path;
 import 'package:wallywiz/extensions/map.dart';
 import 'package:wallywiz/extensions/list.dart';
+import 'package:window_manager/window_manager.dart';
 
 @pragma("vm:entry-point")
 void callbackDispatcher() {
@@ -89,9 +91,25 @@ void callbackDispatcher() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsAndroid) {
-    await Workmanager().initialize(callbackDispatcher);
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: kDebugMode,
+    );
   }
   if (kIsDesktop) {
+    await windowManager.ensureInitialized();
+    const windowOptions = WindowOptions(
+      size: Size(800, 600),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+      title: "WallyWiz",
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
     Wallpaper.initialize();
   }
   runApp(const ProviderScope(child: MyApp()));
