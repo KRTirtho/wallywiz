@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:desktop_wallpaper/desktop_wallpaper.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/Home/Home.dart';
 import 'package:wallywiz/providers/preferences.dart';
+import 'package:wallywiz/utils/platform.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
@@ -86,8 +88,11 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isAndroid) {
+  if (kIsAndroid) {
     await Workmanager().initialize(callbackDispatcher);
+  }
+  if (kIsDesktop) {
+    Wallpaper.initialize();
   }
   runApp(const ProviderScope(child: MyApp()));
 }
