@@ -12,6 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wallywiz/components/Settings/SettingsTile.dart';
+import 'package:wallywiz/components/shared/page_window_title_bar.dart';
 import 'package:wallywiz/models/ConfigurationSchema.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/preferences.dart';
@@ -42,8 +43,8 @@ class Settings extends ConsumerWidget {
     final preferences = ref.watch(userPreferencesProvider);
     final wp = ref.watch(wallpaperProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Settings"),
+      appBar: const PageWindowTitleBar(
+        title: Text("Settings"),
         centerTitle: true,
       ),
       body: ListView(

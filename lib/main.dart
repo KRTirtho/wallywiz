@@ -105,6 +105,7 @@ void main() async {
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.hidden,
       title: "WallyWiz",
+      minimumSize: Size(400, 300),
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
@@ -140,7 +141,7 @@ class MyApp extends HookConsumerWidget {
             foregroundColor: Colors.grey[700],
           ),
         ),
-        listTileTheme: const ListTileThemeData(horizontalTitleGap: 0),
+        listTileTheme: const ListTileThemeData(horizontalTitleGap: 10),
         inputDecorationTheme: const InputDecorationTheme(
             contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             enabledBorder: OutlineInputBorder(

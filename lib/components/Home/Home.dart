@@ -9,6 +9,7 @@ import 'package:wallywiz/components/Settings/Settings.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
 import 'package:wallywiz/components/shared/MarqueeText.dart';
 import 'package:wallywiz/components/WallpaperSupplierView/WallpaperSupplierView.dart';
+import 'package:wallywiz/components/shared/page_window_title_bar.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 
@@ -35,7 +36,7 @@ class Home extends HookConsumerWidget {
     }, [brightness]);
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
+        appBar: PageWindowTitleBar(
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: SvgPicture.asset(

@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/HeaderDialog.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/JsonPropertyPicker.dart';
 import 'package:wallywiz/components/shared/MarqueeText.dart';
+import 'package:wallywiz/components/shared/page_window_title_bar.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
 import 'package:wallywiz/providers/wallpaper-provider.dart';
 import 'package:path/path.dart' as path;
@@ -66,7 +67,7 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PageWindowTitleBar(
         automaticallyImplyLeading: false,
         actions: [
           IconButton(

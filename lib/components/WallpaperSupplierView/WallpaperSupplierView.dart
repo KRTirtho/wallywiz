@@ -8,6 +8,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
+import 'package:wallywiz/components/shared/page_window_title_bar.dart';
 import 'package:wallywiz/helpers/toCapitalCase.dart';
 import 'package:wallywiz/hooks/usePaletteGenerator.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';
@@ -65,7 +66,8 @@ class WallpaperSupplierView extends HookConsumerWidget {
             child: Scaffold(
               backgroundColor:
                   Theme.of(context).backgroundColor.withOpacity(.2),
-              appBar: AppBar(
+              appBar: PageWindowTitleBar(
+                automaticallyImplyLeading: true,
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
                 title: Text(wallpaperSource.name),

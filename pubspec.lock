@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  change_case:
+    dependency: transitive
+    description:
+      name: change_case
+      sha256: f4e08feaa845e75e4f5ad2b0e15f24813d7ea6c27e7b78252f0c17f752cf1157
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   characters:
     dependency: transitive
     description:
@@ -233,6 +241,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: "6f07cba3f7b3448d42d015bfd3d53fe12e5b36da2423f23838efc1d5fb31a263"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.8"
   desktop_wallpaper:
     dependency: "direct main"
     description:
@@ -479,6 +495,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.1"
+  gsettings:
+    dependency: transitive
+    description:
+      name: gsettings
+      sha256: fe90d719e09a6f36607021047e642068a0c98839d9633db00b91633420ae8b0d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.7"
   hooks_riverpod:
     dependency: "direct main"
     description:
@@ -1084,6 +1108,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  titlebar_buttons:
+    dependency: "direct main"
+    description:
+      name: titlebar_buttons
+      sha256: babf62b48b80f290b9ef8b0135df7d9e9bebcb9c27e8380a53df9bb72f3fb03c
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   tuple:
     dependency: transitive
     description:
@@ -1256,10 +1288,10 @@ packages:
     dependency: transitive
     description:
       name: xdg_directories
-      sha256: ee1505df1426458f7f60aac270645098d318a8b4766d85fde75f76f2e21807d1
+      sha256: bd512f03919aac5f1313eb8249f223bacf4927031bf60b02601f81f687689e86
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "0.2.0+3"
   xml:
     dependency: transitive
     description:
