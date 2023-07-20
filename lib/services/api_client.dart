@@ -3,6 +3,8 @@ import 'package:wallywiz/collections/env.dart';
 import 'package:wallywiz/models/category.dart';
 import 'package:wallywiz/models/wallpaper.dart';
 
+typedef PagedData<T> = ({List<T> data, int? next});
+
 class _ApiClient {
   Dio client;
 
@@ -19,7 +21,7 @@ class _ApiClient {
           ),
         );
 
-  Future<({List<Category> categories, int? next})> listCategoriesPaginated({
+  Future<PagedData<Category>> listCategoriesPaginated({
     int page = 1,
   }) async {
     final response = await client.get('/categories', queryParameters: {
@@ -27,7 +29,7 @@ class _ApiClient {
     });
     final data = response.data as List<dynamic>;
     return (
-      categories: data.map((e) => Category.fromJson(e)).toList(),
+      data: data.map((e) => Category.fromJson(e)).toList(),
       next: data.length < 10 ? null : page + 1,
     );
   }

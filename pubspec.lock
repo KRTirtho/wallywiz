@@ -201,6 +201,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  connectivity_plus:
+    dependency: transitive
+    description:
+      name: connectivity_plus
+      sha256: "8599ae9edca5ff96163fca3e36f8e481ea917d1e71cdad912c084b5579913f34"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.1"
+  connectivity_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: connectivity_plus_platform_interface
+      sha256: cf1d1c28f4416f8c654d7dc3cd638ec586076255d407cef3ddbdaf178272a71a
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.4"
   convert:
     dependency: transitive
     description:
@@ -368,6 +384,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  fl_query:
+    dependency: "direct main"
+    description:
+      name: fl_query
+      sha256: "64f482fc09eb1166adca232f68772b2b11c616d88bce3208b2753c940ebc9f71"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-alpha.3"
+  fl_query_connectivity_plus_adapter:
+    dependency: "direct main"
+    description:
+      name: fl_query_connectivity_plus_adapter
+      sha256: a0e69615e25f6dfe74d1e5a0909aeeb865e93c65dd4e0b236f0846f9e54f758b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0-alpha.2"
+  fl_query_hooks:
+    dependency: "direct main"
+    description:
+      name: fl_query_hooks
+      sha256: b0ffc81fb047cbcedd9766776f9c72b95382730ce173226f0695c3f45774b0bc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-alpha.3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -503,6 +543,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.7"
+  hive:
+    dependency: transitive
+    description:
+      name: hive
+      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.3"
+  hive_flutter:
+    dependency: transitive
+    description:
+      name: hive_flutter
+      sha256: dca1da446b1d808a51689fb5d0c6c9510c0a2ba01e22805d492c73b68e33eecc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   hooks_riverpod:
     dependency: "direct main"
     description:
@@ -711,6 +767,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  mutex:
+    dependency: transitive
+    description:
+      name: mutex
+      sha256: "03116a4e46282a671b46c12de649d72c0ed18188ffe12a8d0fc63e83f4ad88f4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
+  nm:
+    dependency: transitive
+    description:
+      name: nm
+      sha256: "2c9aae4127bdc8993206464fcc063611e0e36e72018696cd9631023a31b24254"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   octo_image:
     dependency: transitive
     description:

@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:desktop_wallpaper/desktop_wallpaper.dart';
+import 'package:fl_query/fl_query.dart';
+import 'package:fl_query_connectivity_plus_adapter/fl_query_connectivity_plus_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:wallywiz/components/Home/Home.dart';
 import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/utils/platform.dart';
@@ -90,6 +93,13 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await QueryClient.initialize(
+    cachePrefix: 'dev.krtirtho.wallywiz',
+    connectivity: FlQueryConnectivityPlusAdapter(),
+    cacheDir: (await getApplicationSupportDirectory()).path,
+  );
+
   if (kIsAndroid) {
     await Workmanager().initialize(
       callbackDispatcher,
