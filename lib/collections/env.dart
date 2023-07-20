@@ -14,4 +14,6 @@ abstract class Env {
   static final String pixabayKey = _Env.pixabayKey;
   @EnviedField(varName: 'WALLHAVEN_KEY')
   static final String wallHavenKey = _Env.wallHavenKey;
+  @EnviedField(varName: 'API_KEY')
+  static final String apiKey = _Env.apiKey;
 }

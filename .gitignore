@@ -47,6 +47,7 @@ app.*.map.json
 
 
 /lib/secrets.dart
+/lib/collections/env.g.dart
 
 **/*.env*
 !**/.env.example
