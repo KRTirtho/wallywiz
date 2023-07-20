@@ -16,4 +16,6 @@ abstract class Env {
   static final String wallHavenKey = _Env.wallHavenKey;
   @EnviedField(varName: 'API_KEY')
   static final String apiKey = _Env.apiKey;
+  @EnviedField(varName: 'API_URL')
+  static final String apiUrl = _Env.apiUrl;
 }
