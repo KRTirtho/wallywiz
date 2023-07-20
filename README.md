@@ -38,5 +38,5 @@ But the biggest highlight is that you can **pick image url property from JSON** 
 
 ## License
 
-[BSD-4-Clause License](/LICENSE)
+[Microsoft Reference Source License (MS-RSL)](/LICENSE)
 
