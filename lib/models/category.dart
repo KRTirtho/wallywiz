@@ -30,6 +30,8 @@ class Category {
 
   late final String title;
 
+  late final List<String> thumbnails;
+
   Category({
     required this.id,
     required this.remoteId,
@@ -37,6 +39,7 @@ class Category {
     required this.createdAt,
     required this.updatedAt,
     required this.title,
+    required this.thumbnails,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) =>

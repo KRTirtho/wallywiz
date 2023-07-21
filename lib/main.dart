@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:wallywiz/components/Home/Home.dart';
+import 'package:wallywiz/collections/routes.dart';
 import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/utils/platform.dart';
 import 'package:workmanager/workmanager.dart';
@@ -123,7 +123,15 @@ void main() async {
     });
     Wallpaper.initialize();
   }
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    ProviderScope(
+      child: QueryClientProvider(
+        retryDelay: const Duration(seconds: 20),
+        maxRetries: 2,
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 // ignore: constant_identifier_names
@@ -137,10 +145,11 @@ class MyApp extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final preferences = ref.watch(userPreferencesProvider);
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'WallyWiz',
       themeMode: preferences.themeMode,
       debugShowCheckedModeBanner: false,
+      routerConfig: router,
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
@@ -195,7 +204,6 @@ class MyApp extends HookConsumerWidget {
           ),
         ),
       ),
-      home: const Home(),
     );
   }
 }

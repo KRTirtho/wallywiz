@@ -11,7 +11,7 @@ import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:wallywiz/components/Settings/SettingsTile.dart';
+import 'package:wallywiz/components/settings/SettingsTile.dart';
 import 'package:wallywiz/components/shared/page_window_title_bar.dart';
 import 'package:wallywiz/models/ConfigurationSchema.dart';
 import 'package:wallywiz/models/WallpaperSource.dart';

@@ -11,6 +11,10 @@ class _UseQueries {
       (page) => apiClient.listCategoriesPaginated(page: page),
       initialPage: 1,
       nextPage: (lastPage, lastPageData) => lastPageData.next,
+      retryConfig: DefaultConstants.retryConfig.copyWith(
+        maxRetries: 2,
+        retryDelay: const Duration(seconds: 5),
+      ),
     );
 
     return query;

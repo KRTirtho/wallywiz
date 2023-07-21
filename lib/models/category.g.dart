@@ -13,6 +13,9 @@ Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
       createdAt: Category._fromJson(json['created_at'] as String),
       updatedAt: Category._fromJson(json['updated_at'] as String),
       title: json['title'] as String,
+      thumbnails: (json['thumbnails'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
@@ -22,4 +25,5 @@ Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
       'created_at': Category._toJson(instance.createdAt),
       'updated_at': Category._toJson(instance.updatedAt),
       'title': instance.title,
+      'thumbnails': instance.thumbnails,
     };
