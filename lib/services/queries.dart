@@ -43,6 +43,16 @@ class _UseQueries {
       'trending',
       (page) => apiClient.trendingCategoryWallpapers(page),
       initialPage: 1,
+      jsonConfig: JsonConfig(
+        fromJson: (json) => List.from(json["data"])
+            .map(
+              (e) => Wallpaper.fromJson(
+                Map.castFrom<dynamic, dynamic, String, dynamic>(e),
+              ),
+            )
+            .toList(),
+        toJson: (data) => {"data": data.map((e) => e.toJson()).toList()},
+      ),
       nextPage: (lastPage, lastPageData) =>
           lastPageData.length < 10 ? null : lastPage + 1,
     );

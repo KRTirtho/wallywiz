@@ -67,7 +67,7 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: PageWindowTitleBar(
+      appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -75,16 +75,8 @@ class CreateWallpaperProviderView extends HookConsumerWidget {
             onPressed: () => Navigator.pop(context),
           )
         ],
-        title: SizedBox(
-          height: 25,
-          child: MarqueeText(
-            text: wallpaperSource != null
-                ? "Update configuration of ${wallpaperSource?.name}"
-                : "Add Wallpaper Provider",
-            staticLimit: 23,
-          ),
-        ),
       ),
+      extendBodyBehindAppBar: true,
       body: Form(
         key: formKey,
         child: Padding(

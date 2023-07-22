@@ -47,7 +47,6 @@ class Home extends HookConsumerWidget {
             ));
           },
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: GridView.builder(
           controller: controller,
           itemCount: categories.length,
