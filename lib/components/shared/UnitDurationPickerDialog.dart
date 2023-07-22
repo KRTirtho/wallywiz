@@ -25,7 +25,10 @@ class UnitDurationPickerDialog extends HookWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             DurationPicker(
-              onChange: (value) => duration.value = value,
+              onChange: (value) {
+                if (value > const Duration(hours: 23)) return;
+                duration.value = value;
+              },
               duration: duration.value,
               baseUnit: baseUnit.value,
             ),

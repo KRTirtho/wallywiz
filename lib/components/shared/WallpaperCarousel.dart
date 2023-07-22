@@ -24,6 +24,8 @@ class WallpaperCarousel extends HookWidget {
     final duration = useState<Duration>(Duration.zero);
     final durationController = useTextEditingController();
 
+    final selectedWallpapers = useState<Set<Wallpaper>>({});
+
     final carouselSlider = CarouselSlider(
       carouselController: controller,
       options: CarouselOptions(
@@ -37,78 +39,174 @@ class WallpaperCarousel extends HookWidget {
       ),
       items: [
         for (final wallpaper in wallpapers)
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: CachedNetworkImage(
-                      imageUrl: wallpaper.hdUrl,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: RichText(
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      text: TextSpan(
-                        text: wallpaper.authorName,
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            launchUrlString(
-                              wallpaper.authorUrl,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          },
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                                // bottomLeft
-                                offset: Offset(-1.5, -1.5),
-                                color: Colors.black38),
-                            Shadow(
-                                // bottomRight
-                                offset: Offset(1.5, -1.5),
-                                color: Colors.black38),
-                            Shadow(
-                                // topRight
-                                offset: Offset(1.5, 1.5),
-                                color: Colors.black38),
-                            Shadow(
-                                // topLeft
-                                offset: Offset(-1.5, 1.5),
-                                color: Colors.black38),
-                          ],
-                        ),
-                        children: [
-                          TextSpan(
-                            text: ' (${wallpaper.remoteApi})',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelMedium
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ],
+          InkWell(
+            borderRadius: BorderRadius.circular(15),
+            onLongPress: () {
+              selectedWallpapers.value = {
+                ...selectedWallpapers.value,
+                wallpaper,
+              };
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: CachedNetworkImage(
+                        imageUrl: wallpaper.hdUrl,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    bottom: 10,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        text: TextSpan(
+                          text: wallpaper.authorName,
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              launchUrlString(
+                                wallpaper.authorUrl,
+                                mode: LaunchMode.externalApplication,
+                              );
+                            },
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                  // bottomLeft
+                                  offset: Offset(-1.5, -1.5),
+                                  color: Colors.black38),
+                              Shadow(
+                                  // bottomRight
+                                  offset: Offset(1.5, -1.5),
+                                  color: Colors.black38),
+                              Shadow(
+                                  // topRight
+                                  offset: Offset(1.5, 1.5),
+                                  color: Colors.black38),
+                              Shadow(
+                                  // topLeft
+                                  offset: Offset(-1.5, 1.5),
+                                  color: Colors.black38),
+                            ],
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' (${wallpaper.remoteApi})',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
       ],
+    );
+
+    final selectionGridView = Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Selected Wallpapers (${selectedWallpapers.value.length})',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const Spacer(),
+              FilledButton.tonalIcon(
+                icon: const Icon(Icons.delete_outline),
+                label: const Text('Clear All'),
+                onPressed: () {
+                  selectedWallpapers.value = {};
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 120,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: wallpapers.length,
+              itemBuilder: (context, index) {
+                final wallpaper = wallpapers[index];
+                final isSelected = selectedWallpapers.value.contains(wallpaper);
+                return InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    if (isSelected) {
+                      selectedWallpapers.value = {
+                        ...selectedWallpapers.value,
+                      }..remove(wallpaper);
+                    } else {
+                      selectedWallpapers.value = {
+                        ...selectedWallpapers.value,
+                        wallpaper,
+                      };
+                    }
+                  },
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color:
+                                isSelected ? Colors.blue : Colors.transparent,
+                            width: 3,
+                          ),
+                          image: DecorationImage(
+                            image: CachedNetworkImageProvider(wallpaper.hdUrl),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
 
     onDurationPicker() async {
@@ -122,8 +220,6 @@ class WallpaperCarousel extends HookWidget {
       durationController.text =
           '${durationVal.inHours}h:${durationVal.inMinutes.remainder(60)}m';
     }
-
-    ;
 
     return CallbackShortcuts(
       bindings: {
@@ -148,7 +244,12 @@ class WallpaperCarousel extends HookWidget {
                 width: constrains.mdAndUp
                     ? constrains.maxWidth * 0.7
                     : constrains.maxWidth,
-                child: carouselSlider,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: selectedWallpapers.value.isEmpty
+                      ? carouselSlider
+                      : selectionGridView,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -197,11 +298,12 @@ class WallpaperCarousel extends HookWidget {
                     const SizedBox(height: 10),
                     FilledButton.tonalIcon(
                       icon: const Icon(Icons.play_arrow_outlined),
-                      label: const Text('Play'),
+                      label: Text(
+                        selectedWallpapers.value.isEmpty
+                            ? 'Shuffle Wallpapers'
+                            : 'Shuffle Selected Wallpapers',
+                      ),
                       style: FilledButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
                         minimumSize: Size(
                           ((constrains.mdAndUp
                                   ? constrains.maxWidth -
