@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/models/category.dart';
+import 'package:wallywiz/utils/clean-title.dart';
 
 class CategoryCard extends HookConsumerWidget {
   final Category category;
@@ -14,17 +15,8 @@ class CategoryCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final cleanTitle = useMemoized(
-      () {
-        final cleaned = category.title
-            .split(RegExp(r"[-_]"))
-            .map(
-              (e) => e.trim()[0].toUpperCase() + e.trim().substring(1),
-            )
-            .join(" ");
-
-        return cleaned[0].toUpperCase() + cleaned.substring(1);
-      },
+    final cleanedTitle = useMemoized(
+      () => cleanTitle(category.title),
       [category.title],
     );
 
@@ -32,7 +24,7 @@ class CategoryCard extends HookConsumerWidget {
       borderRadius: BorderRadius.circular(10),
       onTap: () {
         GoRouter.of(context).go(
-          '/category/${category.title}',
+          '/categories/${category.title}/wallpapers',
           extra: category,
         );
       },
@@ -53,9 +45,10 @@ class CategoryCard extends HookConsumerWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              cleanTitle,
+              cleanedTitle,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),
