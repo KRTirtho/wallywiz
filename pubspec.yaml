@@ -47,6 +47,7 @@ dependencies:
   visibility_detector: ^0.4.0+2
   carousel_slider: ^4.2.1
   flutter_adaptive_scaffold: ^0.1.6
+  duration_picker: ^1.1.1
 
 dev_dependencies:
   flutter_test:
