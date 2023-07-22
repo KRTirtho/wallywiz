@@ -37,6 +37,28 @@ class _UseQueries {
 
     return query;
   }
+
+  InfiniteQuery<List<Wallpaper>, dynamic, int> trendingCategoryWallpapers() {
+    final query = useInfiniteQuery<List<Wallpaper>, dynamic, int>(
+      'trending',
+      (page) => apiClient.trendingCategoryWallpapers(page),
+      initialPage: 1,
+      nextPage: (lastPage, lastPageData) =>
+          lastPageData.length < 10 ? null : lastPage + 1,
+    );
+    return query;
+  }
+
+  InfiniteQuery<List<Wallpaper>, dynamic, int> latestCategoryWallpapers() {
+    final query = useInfiniteQuery<List<Wallpaper>, dynamic, int>(
+      'latest',
+      (page) => apiClient.latestCategoryWallpapers(page),
+      initialPage: 1,
+      nextPage: (lastPage, lastPageData) =>
+          lastPageData.length < 10 ? null : lastPage + 1,
+    );
+    return query;
+  }
 }
 
 final useApi = _UseQueries();

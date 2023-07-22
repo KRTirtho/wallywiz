@@ -44,6 +44,26 @@ class _ApiClient {
     final data = response.data as List<dynamic>;
     return data.map((e) => Wallpaper.fromJson(e)).toList();
   }
+
+  Future<List<Wallpaper>> trendingCategoryWallpapers([int page = 1]) async {
+    final response = await client.get('/trending', queryParameters: {
+      'page': page,
+    });
+
+    return (response.data as List<dynamic>)
+        .map((e) => Wallpaper.fromJson(e))
+        .toList();
+  }
+
+  Future<List<Wallpaper>> latestCategoryWallpapers([int page = 1]) async {
+    final response = await client.get('/latest', queryParameters: {
+      'page': page,
+    });
+
+    return (response.data as List<dynamic>)
+        .map((e) => Wallpaper.fromJson(e))
+        .toList();
+  }
 }
 
 final apiClient = _ApiClient();

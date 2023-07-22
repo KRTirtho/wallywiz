@@ -23,24 +23,23 @@ class CategoryCard extends HookConsumerWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: () {
-        GoRouter.of(context).go(
+        GoRouter.of(context).push(
           '/categories/${category.title}/wallpapers',
           extra: category,
         );
       },
       child: Container(
-        width: 150,
         margin: const EdgeInsets.all(8),
         child: Column(
           children: [
             // 2x2 grid of thumbnail
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: CachedNetworkImage(
-                imageUrl: category.thumbnails.first,
-                fit: BoxFit.cover,
-                height: 180,
-                width: 150,
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: CachedNetworkImage(
+                  imageUrl: category.thumbnails.first,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             const SizedBox(height: 5),
