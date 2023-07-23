@@ -10,7 +10,7 @@ InterstitialAd? useInterstitialAd(String adUnitId) {
     () async {
       await InterstitialAd.load(
           adUnitId: kDebugMode ? AdIds.demoInterstitial : adUnitId,
-          request: const AdRequest(),
+          request: const AdRequest(nonPersonalizedAds: true),
           adLoadCallback: InterstitialAdLoadCallback(
             // Called when an ad is successfully received.
             onAdLoaded: (ad) {

@@ -1,15 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wallywiz/collections/ad_ids.dart';
 import 'package:wallywiz/components/shared/UnitDurationPickerDialog.dart';
+import 'package:wallywiz/components/shared/WallpaperCarouselItem.dart';
 import 'package:wallywiz/extensions/constrains.dart';
-import 'package:wallywiz/hooks/useInterStitialAd.dart';
+import 'package:wallywiz/hooks/useInterstitialAd.dart';
+import 'package:wallywiz/hooks/useMultiBannerAds.dart';
 import 'package:wallywiz/models/wallpaper.dart';
 
 final adClickCounter = StateProvider((ref) => 0);
@@ -33,6 +34,9 @@ class WallpaperCarousel extends HookConsumerWidget {
 
     final interstitialAd = useInterstitialAd(AdIds.openCategoryInterstitial);
 
+    final adFilledWallpapers =
+        useMultiBannerAds(items: wallpapers, adSize: AdSize.mediumRectangle);
+
     final carouselSlider = CarouselSlider(
       carouselController: controller,
       options: CarouselOptions(
@@ -45,87 +49,27 @@ class WallpaperCarousel extends HookConsumerWidget {
         },
       ),
       items: [
-        for (final wallpaper in wallpapers)
-          InkWell(
-            borderRadius: BorderRadius.circular(15),
-            onLongPress: () {
-              selectedWallpapers.value = {
-                ...selectedWallpapers.value,
-                wallpaper,
-              };
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: CachedNetworkImage(
-                        imageUrl: wallpaper.hdUrl,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: RichText(
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        text: TextSpan(
-                          text: wallpaper.authorName,
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              launchUrlString(
-                                wallpaper.authorUrl,
-                                mode: LaunchMode.externalApplication,
-                              );
-                            },
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                  // bottomLeft
-                                  offset: Offset(-1.5, -1.5),
-                                  color: Colors.black38),
-                              Shadow(
-                                  // bottomRight
-                                  offset: Offset(1.5, -1.5),
-                                  color: Colors.black38),
-                              Shadow(
-                                  // topRight
-                                  offset: Offset(1.5, 1.5),
-                                  color: Colors.black38),
-                              Shadow(
-                                  // topLeft
-                                  offset: Offset(-1.5, 1.5),
-                                  color: Colors.black38),
-                            ],
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' (${wallpaper.remoteApi})',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        for (final wallpaper in adFilledWallpapers)
+          if (wallpaper is Wallpaper)
+            WallpaperCarouselItem(
+              wallpaper: wallpaper,
+              onLongPress: () {
+                selectedWallpapers.value = {
+                  ...selectedWallpapers.value,
+                  wallpaper,
+                };
+              },
+            )
+          else if (wallpaper is BannerAdItem && wallpaper.isAdLoaded)
+            SizedBox(
+              height: AdSize.mediumRectangle.height.toDouble(),
+              width: AdSize.mediumRectangle.width.toDouble(),
+              child: StatefulBuilder(builder: (context, setState) {
+                return AdWidget(
+                  ad: wallpaper.bannerAd,
+                );
+              }),
+            )
       ],
     );
 
@@ -228,117 +172,127 @@ class WallpaperCarousel extends HookConsumerWidget {
           '${durationVal.inHours}h:${durationVal.inMinutes.remainder(60)}m';
     }
 
-    return CallbackShortcuts(
-      bindings: {
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft): () {
-          controller.previousPage();
-        },
-        LogicalKeySet(LogicalKeyboardKey.arrowRight): () {
-          controller.nextPage();
-        },
+    return WillPopScope(
+      onWillPop: () {
+        if (selectedWallpapers.value.isNotEmpty) {
+          selectedWallpapers.value = {};
+          return Future.value(false);
+        }
+        return Future.value(true);
       },
-      child: Focus(
-        autofocus: true,
-        child: SafeArea(
-          child: LayoutBuilder(builder: (context, constrains) {
-            return SingleChildScrollView(
-              child: Flex(
-                direction: constrains.mdAndUp ? Axis.horizontal : Axis.vertical,
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height:
-                        constrains.maxHeight - (constrains.mdAndUp ? 0 : 120),
-                    width: constrains.mdAndUp
-                        ? constrains.maxWidth * 0.7
-                        : constrains.maxWidth,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: selectedWallpapers.value.isEmpty
-                          ? carouselSlider
-                          : selectionGridView,
+      child: CallbackShortcuts(
+        bindings: {
+          LogicalKeySet(LogicalKeyboardKey.arrowLeft): () {
+            controller.previousPage();
+          },
+          LogicalKeySet(LogicalKeyboardKey.arrowRight): () {
+            controller.nextPage();
+          },
+        },
+        child: Focus(
+          autofocus: true,
+          child: SafeArea(
+            child: LayoutBuilder(builder: (context, constrains) {
+              return SingleChildScrollView(
+                child: Flex(
+                  direction:
+                      constrains.mdAndUp ? Axis.horizontal : Axis.vertical,
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height:
+                          constrains.maxHeight - (constrains.mdAndUp ? 0 : 120),
+                      width: constrains.mdAndUp
+                          ? constrains.maxWidth * 0.7
+                          : constrains.maxWidth,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: selectedWallpapers.value.isEmpty
+                            ? carouselSlider
+                            : selectionGridView,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Flexible(
-                              child: TextField(
-                                controller: durationController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                readOnly: true,
-                                onTap: onDurationPicker,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: TextField(
+                                  controller: durationController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  readOnly: true,
+                                  onTap: onDurationPicker,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    labelText: 'Shuffle Duration',
+                                  ),
+                                ),
+                              ),
+                              const SizedBox.square(dimension: 10),
+                              IconButton.filledTonal(
+                                icon: const Icon(Icons.timer_outlined),
+                                style: IconButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  labelText: 'Shuffle Duration',
                                 ),
+                                onPressed: onDurationPicker,
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          FilledButton.tonalIcon(
+                            icon: const Icon(Icons.play_arrow_outlined),
+                            label: Text(
+                              selectedWallpapers.value.isEmpty
+                                  ? 'Shuffle Wallpapers'
+                                  : 'Shuffle Selected Wallpapers',
+                            ),
+                            style: FilledButton.styleFrom(
+                              minimumSize: Size(
+                                ((constrains.mdAndUp
+                                        ? constrains.maxWidth -
+                                            (constrains.maxWidth * 0.7)
+                                        : constrains.maxWidth)) -
+                                    20,
+                                40,
                               ),
                             ),
-                            const SizedBox.square(dimension: 10),
-                            IconButton.filledTonal(
-                              icon: const Icon(Icons.timer_outlined),
-                              style: IconButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: onDurationPicker,
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        FilledButton.tonalIcon(
-                          icon: const Icon(Icons.play_arrow_outlined),
-                          label: Text(
-                            selectedWallpapers.value.isEmpty
-                                ? 'Shuffle Wallpapers'
-                                : 'Shuffle Selected Wallpapers',
+                            onPressed: () async {
+                              final clicked = ref.read(adClickCounter);
+                              // don't show the ad if the user has clicked 3 times
+                              if (clicked == 2) {
+                                await interstitialAd?.show().then(
+                                      (_) {},
+                                    );
+                                ref
+                                    .read(adClickCounter.notifier)
+                                    .update((s) => 1);
+                              } else {
+                                ref
+                                    .read(adClickCounter.notifier)
+                                    .update((s) => s + 1);
+                              }
+                            },
                           ),
-                          style: FilledButton.styleFrom(
-                            minimumSize: Size(
-                              ((constrains.mdAndUp
-                                      ? constrains.maxWidth -
-                                          (constrains.maxWidth * 0.7)
-                                      : constrains.maxWidth)) -
-                                  20,
-                              40,
-                            ),
-                          ),
-                          onPressed: () async {
-                            final clicked = ref.read(adClickCounter);
-                            // don't show the ad if the user has clicked 3 times
-                            if (clicked == 2) {
-                              await interstitialAd?.show().then(
-                                    (_) {},
-                                  );
-                              ref
-                                  .read(adClickCounter.notifier)
-                                  .update((s) => 1);
-                            } else {
-                              ref
-                                  .read(adClickCounter.notifier)
-                                  .update((s) => s + 1);
-                            }
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }),
+                  ],
+                ),
+              );
+            }),
+          ),
         ),
       ),
     );
