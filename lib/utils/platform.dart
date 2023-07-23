@@ -10,3 +10,5 @@ final kIsIos = kIsWeb ? false : Platform.isIOS;
 
 final kIsDesktop = kIsMacos || kIsWindows || kIsLinux;
 final kIsMobile = kIsAndroid || kIsIos;
+
+final kAdPlatform = kIsAndroid || kIsIos;

@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wallywiz/components/shared/UnitDurationPickerDialog.dart';
 import 'package:wallywiz/extensions/constrains.dart';
 import 'package:wallywiz/models/wallpaper.dart';
+import 'package:wallywiz/utils/platform.dart';
 
 class WallpaperCarousel extends HookWidget {
   final List<Wallpaper> wallpapers;
@@ -25,6 +26,8 @@ class WallpaperCarousel extends HookWidget {
     final durationController = useTextEditingController();
 
     final selectedWallpapers = useState<Set<Wallpaper>>({});
+
+    final mediaQuery = MediaQuery.of(context);
 
     final carouselSlider = CarouselSlider(
       carouselController: controller,
@@ -232,95 +235,92 @@ class WallpaperCarousel extends HookWidget {
       },
       child: Focus(
         autofocus: true,
-        child: LayoutBuilder(builder: (context, constrains) {
-          return Flex(
-            direction: constrains.mdAndUp ? Axis.horizontal : Axis.vertical,
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: constrains.mdAndUp
-                    ? constrains.maxHeight
-                    : constrains.maxHeight - 100,
-                width: constrains.mdAndUp
-                    ? constrains.maxWidth * 0.7
-                    : constrains.maxWidth,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: selectedWallpapers.value.isEmpty
-                      ? carouselSlider
-                      : selectionGridView,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
+        child: SafeArea(
+          child: LayoutBuilder(builder: (context, constrains) {
+            return SingleChildScrollView(
+              child: Flex(
+                direction: constrains.mdAndUp ? Axis.horizontal : Axis.vertical,
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height:
+                        constrains.maxHeight - (constrains.mdAndUp ? 0 : 120),
+                    width: constrains.mdAndUp
+                        ? constrains.maxWidth * 0.7
+                        : constrains.maxWidth,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: selectedWallpapers.value.isEmpty
+                          ? carouselSlider
+                          : selectionGridView,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: (constrains.mdAndUp
-                                  ? constrains.maxWidth -
-                                      (constrains.maxWidth * 0.7)
-                                  : constrains.maxWidth) -
-                              70,
-                          height: 40,
-                          child: TextField(
-                            controller: durationController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            readOnly: true,
-                            onTap: onDurationPicker,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: TextField(
+                                controller: durationController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                readOnly: true,
+                                onTap: onDurationPicker,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  labelText: 'Shuffle Duration',
+                                ),
                               ),
-                              labelText: 'Shuffle Duration',
                             ),
-                          ),
+                            const SizedBox.square(dimension: 10),
+                            IconButton.filledTonal(
+                              icon: const Icon(Icons.timer_outlined),
+                              style: IconButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: onDurationPicker,
+                            )
+                          ],
                         ),
-                        const SizedBox.square(dimension: 10),
-                        IconButton.filledTonal(
-                          icon: const Icon(Icons.timer_outlined),
-                          style: IconButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                        const SizedBox(height: 10),
+                        FilledButton.tonalIcon(
+                          icon: const Icon(Icons.play_arrow_outlined),
+                          label: Text(
+                            selectedWallpapers.value.isEmpty
+                                ? 'Shuffle Wallpapers'
+                                : 'Shuffle Selected Wallpapers',
+                          ),
+                          style: FilledButton.styleFrom(
+                            minimumSize: Size(
+                              ((constrains.mdAndUp
+                                      ? constrains.maxWidth -
+                                          (constrains.maxWidth * 0.7)
+                                      : constrains.maxWidth)) -
+                                  20,
+                              40,
                             ),
                           ),
-                          onPressed: onDurationPicker,
-                        )
+                          onPressed: () {},
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    FilledButton.tonalIcon(
-                      icon: const Icon(Icons.play_arrow_outlined),
-                      label: Text(
-                        selectedWallpapers.value.isEmpty
-                            ? 'Shuffle Wallpapers'
-                            : 'Shuffle Selected Wallpapers',
-                      ),
-                      style: FilledButton.styleFrom(
-                        minimumSize: Size(
-                          ((constrains.mdAndUp
-                                  ? constrains.maxWidth -
-                                      (constrains.maxWidth * 0.7)
-                                  : constrains.maxWidth)) -
-                              20,
-                          40,
-                        ),
-                      ),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }

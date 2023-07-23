@@ -6,6 +6,7 @@ import 'package:fl_query/fl_query.dart';
 import 'package:fl_query_connectivity_plus_adapter/fl_query_connectivity_plus_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallywiz/collections/routes.dart';
@@ -99,6 +100,10 @@ void main() async {
     connectivity: FlQueryConnectivityPlusAdapter(),
     cacheDir: (await getApplicationSupportDirectory()).path,
   );
+
+  if (kAdPlatform) {
+    await MobileAds.instance.initialize();
+  }
 
   if (kIsAndroid) {
     await Workmanager().initialize(

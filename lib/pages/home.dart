@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wallywiz/collections/ad_ids.dart';
 import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProviderView.dart';
 import 'package:wallywiz/components/home/CategoryCard.dart';
 import 'package:wallywiz/components/shared/waypoint.dart';
+import 'package:wallywiz/hooks/useBannerAd.dart';
 import 'package:wallywiz/services/queries.dart';
 
 class Home extends HookConsumerWidget {
@@ -34,6 +37,8 @@ class Home extends HookConsumerWidget {
       );
       return null;
     }, [brightness]);
+
+    final (:bannerAd, :isAdLoaded) = useBannerAd(adUnitId: AdIds.bottomBanner);
 
     return SafeArea(
       child: Scaffold(
@@ -77,6 +82,15 @@ class Home extends HookConsumerWidget {
             );
           },
         ),
+        bottomNavigationBar: isAdLoaded
+            ? SizedBox(
+                width: bannerAd!.size.width.toDouble(),
+                height: bannerAd.size.height.toDouble(),
+                child: StatefulBuilder(builder: (context, setState) {
+                  return AdWidget(ad: bannerAd);
+                }),
+              )
+            : null,
       ),
     );
   }
