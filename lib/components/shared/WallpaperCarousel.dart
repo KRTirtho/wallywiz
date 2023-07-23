@@ -4,13 +4,17 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:wallywiz/collections/ad_ids.dart';
 import 'package:wallywiz/components/shared/UnitDurationPickerDialog.dart';
 import 'package:wallywiz/extensions/constrains.dart';
+import 'package:wallywiz/hooks/useInterStitialAd.dart';
 import 'package:wallywiz/models/wallpaper.dart';
-import 'package:wallywiz/utils/platform.dart';
 
-class WallpaperCarousel extends HookWidget {
+final adClickCounter = StateProvider((ref) => 0);
+
+class WallpaperCarousel extends HookConsumerWidget {
   final List<Wallpaper> wallpapers;
   final VoidCallback? onEndReached;
   const WallpaperCarousel({
@@ -20,14 +24,14 @@ class WallpaperCarousel extends HookWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
     final controller = useMemoized(() => CarouselController(), []);
     final duration = useState<Duration>(Duration.zero);
     final durationController = useTextEditingController();
 
     final selectedWallpapers = useState<Set<Wallpaper>>({});
 
-    final mediaQuery = MediaQuery.of(context);
+    final interstitialAd = useInterstitialAd(AdIds.openCategoryInterstitial);
 
     final carouselSlider = CarouselSlider(
       carouselController: controller,
@@ -150,7 +154,7 @@ class WallpaperCarousel extends HookWidget {
           const SizedBox(height: 10),
           Expanded(
             child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 120,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
@@ -311,7 +315,22 @@ class WallpaperCarousel extends HookWidget {
                               40,
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () async {
+                            final clicked = ref.read(adClickCounter);
+                            // don't show the ad if the user has clicked 3 times
+                            if (clicked == 2) {
+                              await interstitialAd?.show().then(
+                                    (_) {},
+                                  );
+                              ref
+                                  .read(adClickCounter.notifier)
+                                  .update((s) => 1);
+                            } else {
+                              ref
+                                  .read(adClickCounter.notifier)
+                                  .update((s) => s + 1);
+                            }
+                          },
                         ),
                       ],
                     ),

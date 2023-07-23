@@ -8,6 +8,7 @@ import 'package:wallywiz/components/CreateWallpaperProvider/CreateWallpaperProvi
 import 'package:wallywiz/components/home/CategoryCard.dart';
 import 'package:wallywiz/components/shared/waypoint.dart';
 import 'package:wallywiz/hooks/useBannerAd.dart';
+import 'package:wallywiz/hooks/useInterStitialAd.dart';
 import 'package:wallywiz/services/queries.dart';
 
 class Home extends HookConsumerWidget {

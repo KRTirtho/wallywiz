@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wallywiz/collections/ad_ids.dart';
+import 'package:wallywiz/hooks/useInterStitialAd.dart';
 import 'package:wallywiz/models/category.dart';
 import 'package:wallywiz/utils/clean-title.dart';
 
 class CategoryCard extends HookConsumerWidget {
   final Category category;
+  final Future<void> Function()? onTap;
   const CategoryCard({
     Key? key,
     required this.category,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -22,8 +26,8 @@ class CategoryCard extends HookConsumerWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(10),
-      onTap: () {
-        GoRouter.of(context).push(
+      onTap: () async {
+        await GoRouter.of(context).push(
           '/categories/${category.title}/wallpapers',
           extra: category,
         );
