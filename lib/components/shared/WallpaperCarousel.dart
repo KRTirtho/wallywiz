@@ -194,10 +194,12 @@ class WallpaperCarousel extends HookConsumerWidget {
           child: SafeArea(
             child: LayoutBuilder(builder: (context, constrains) {
               return SingleChildScrollView(
+                physics: constrains.mdAndUp
+                    ? const NeverScrollableScrollPhysics()
+                    : null,
                 child: Flex(
                   direction:
                       constrains.mdAndUp ? Axis.horizontal : Axis.vertical,
-                  // crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
                       height:
@@ -217,38 +219,34 @@ class WallpaperCarousel extends HookConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Flexible(
-                                child: TextField(
-                                  controller: durationController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                  ],
-                                  readOnly: true,
-                                  onTap: onDurationPicker,
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    labelText: 'Shuffle Duration',
-                                  ),
-                                ),
-                              ),
-                              const SizedBox.square(dimension: 10),
-                              IconButton.filledTonal(
-                                icon: const Icon(Icons.timer_outlined),
-                                style: IconButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                onPressed: onDurationPicker,
-                              )
+                          TextField(
+                            controller: durationController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
                             ],
+                            readOnly: true,
+                            onTap: onDurationPicker,
+                            decoration: InputDecoration(
+                                constraints: BoxConstraints(
+                                  maxWidth: constrains.mdAndUp
+                                      ? constrains.maxWidth * 0.3 - 50
+                                      : constrains.maxWidth,
+                                ),
+                                labelText: 'Shuffle Duration',
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: IconButton.filledTonal(
+                                    icon: const Icon(Icons.timer_outlined),
+                                    style: IconButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onPressed: onDurationPicker,
+                                  ),
+                                )),
                           ),
                           const SizedBox(height: 10),
                           FilledButton.tonalIcon(

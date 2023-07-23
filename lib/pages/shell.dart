@@ -35,6 +35,7 @@ class ShellRoutePage extends HookWidget {
       ],
       useDrawer: false,
       appBar: PageWindowTitleBar(
+        scrolledUnderElevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SvgPicture.asset(

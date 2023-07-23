@@ -24,6 +24,7 @@ class PageWindowTitleBar extends StatefulHookWidget
   final TextStyle? titleTextStyle;
   final double? titleWidth;
   final Widget? title;
+  final double? scrolledUnderElevation;
 
   const PageWindowTitleBar({
     Key? key,
@@ -41,6 +42,7 @@ class PageWindowTitleBar extends StatefulHookWidget
     this.titleTextStyle,
     this.titleWidth,
     this.toolbarTextStyle,
+    this.scrolledUnderElevation,
   }) : super(key: key);
 
   @override
@@ -81,6 +83,7 @@ class _PageWindowTitleBarState extends State<PageWindowTitleBar> {
         toolbarTextStyle: widget.toolbarTextStyle,
         titleTextStyle: widget.titleTextStyle,
         title: widget.title,
+        scrolledUnderElevation: widget.scrolledUnderElevation,
       ),
     );
   }

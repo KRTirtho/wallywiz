@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:wallywiz/collections/ad_ids.dart';
+import 'package:wallywiz/utils/platform.dart';
 
 typedef BannerAdItem = ({
   BannerAd bannerAd,
@@ -65,6 +66,7 @@ List useMultiBannerAds<T>({
   );
 
   useEffect(() {
+    if (!kAdPlatform) return null;
     final ads = adFilledItems.whereType<BannerAd>();
     Future.wait(ads.map((ad) => ad.load()));
     return () {
