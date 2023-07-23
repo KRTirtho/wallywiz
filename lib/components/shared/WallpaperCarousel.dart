@@ -12,6 +12,7 @@ import 'package:wallywiz/extensions/constrains.dart';
 import 'package:wallywiz/hooks/useInterstitialAd.dart';
 import 'package:wallywiz/hooks/useMultiBannerAds.dart';
 import 'package:wallywiz/models/wallpaper.dart';
+import 'package:wallywiz/providers/shuffler.dart';
 
 final adClickCounter = StateProvider((ref) => 0);
 
@@ -29,6 +30,7 @@ class WallpaperCarousel extends HookConsumerWidget {
     final controller = useMemoized(() => CarouselController(), []);
     final duration = useState<Duration>(Duration.zero);
     final durationController = useTextEditingController();
+    final shuffler = ref.watch(shufflerProvider);
 
     final selectedWallpapers = useState<Set<Wallpaper>>({});
 
@@ -268,15 +270,34 @@ class WallpaperCarousel extends HookConsumerWidget {
                             ),
                             onPressed: () async {
                               final clicked = ref.read(adClickCounter);
+                              final sourceWallpapers =
+                                  selectedWallpapers.value.isNotEmpty
+                                      ? selectedWallpapers.value
+                                      : wallpapers.toSet();
                               // don't show the ad if the user has clicked 3 times
                               if (clicked == 2) {
-                                await interstitialAd?.show().then(
-                                      (_) {},
-                                    );
+                                await interstitialAd?.show().then((_) {
+                                  ref
+                                      .read(shufflerProvider.notifier)
+                                      .setShuffleSource(
+                                        ShufflerSource(
+                                          interval: duration.value,
+                                          sources: sourceWallpapers,
+                                        ),
+                                      );
+                                });
                                 ref
                                     .read(adClickCounter.notifier)
                                     .update((s) => 1);
                               } else {
+                                ref
+                                    .read(shufflerProvider.notifier)
+                                    .setShuffleSource(
+                                      ShufflerSource(
+                                        interval: duration.value,
+                                        sources: sourceWallpapers,
+                                      ),
+                                    );
                                 ref
                                     .read(adClickCounter.notifier)
                                     .update((s) => s + 1);

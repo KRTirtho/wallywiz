@@ -39,6 +39,11 @@ class _ApiClient {
     return Category.fromJson(response.data);
   }
 
+  Future<Wallpaper> getWallpaper(String id) async {
+    final response = await client.get('/wallpaper/$id');
+    return Wallpaper.fromJson(response.data);
+  }
+
   Future<List<Wallpaper>> listCategoryWallpapers(String id) async {
     final response = await client.get('/categories/$id/wallpapers');
     final data = response.data as List<dynamic>;

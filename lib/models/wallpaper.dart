@@ -62,4 +62,12 @@ class Wallpaper {
       _$WallpaperFromJson(json);
 
   Map<String, dynamic> toJson() => _$WallpaperToJson(this);
+
+  @override
+  operator ==(Object other) {
+    return other is Wallpaper && (other.id == id || other.remoteId == id);
+  }
+
+  @override
+  int get hashCode => super.hashCode ^ id.hashCode ^ remoteId.hashCode;
 }
