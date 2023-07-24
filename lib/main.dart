@@ -27,7 +27,7 @@ void callbackDispatcher() {
       if (inputData == null) return false;
       print("Native called background task: $taskName");
       final taskService = PeriodicTaskService(apiClient: ApiClient());
-      taskService.periodicTaskJob(
+      await taskService.periodicTaskJob(
         (jsonDecode(inputData["data"]) as List)
             .map(
               (source) => (
