@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/main.dart';
@@ -80,21 +81,40 @@ class ShufflerProvider extends PersistedStateNotifier<ShufflerSource> {
       return;
     }
     if (kIsMobile) {
+      final data = jsonEncode(
+        state.sources
+            .map(
+              (source) => {
+                "id": source.id,
+                "remoteId": source.remoteId,
+                "url": source.url,
+              },
+            )
+            .toList(),
+      );
       Workmanager().cancelByUniqueName(WALLPAPER_TASK_UNIQUE_NAME).then((_) {
         Workmanager().registerPeriodicTask(
           WALLPAPER_TASK_UNIQUE_NAME,
           WALLPAPER_TASK_NAME,
           frequency: state.interval,
           constraints: Constraints(networkType: NetworkType.connected),
-          outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
-          inputData: state.toJson(),
+          inputData: {"data": data},
         );
       });
     } else {
       _jobTimer?.cancel();
-      PeriodicTaskService.periodicTaskJob(state.sources.toList());
+      final data = state.sources
+          .map(
+            (source) => (
+              remoteId: source.remoteId,
+              id: source.id,
+              url: source.url,
+            ),
+          )
+          .toList();
+      periodicTasksService.periodicTaskJob(data);
       _jobTimer = Timer.periodic(state.interval, (timer) {
-        PeriodicTaskService.periodicTaskJob(state.sources.toList());
+        periodicTasksService.periodicTaskJob(data);
       });
     }
   }

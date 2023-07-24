@@ -49,6 +49,7 @@ dependencies:
   flutter_adaptive_scaffold: ^0.1.6
   duration_picker: ^1.1.1
   google_mobile_ads: ^2.0.0
+  launch_at_startup: ^0.2.2
 
 dev_dependencies:
   flutter_test:

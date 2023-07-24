@@ -5,10 +5,10 @@ import 'package:wallywiz/models/wallpaper.dart';
 
 typedef PagedData<T> = ({List<T> data, int? next});
 
-class _ApiClient {
+class ApiClient {
   Dio client;
 
-  _ApiClient()
+  ApiClient()
       : client = Dio(
           BaseOptions(
             baseUrl: Env.apiUrl,
@@ -71,4 +71,4 @@ class _ApiClient {
   }
 }
 
-final apiClient = _ApiClient();
+final apiClient = ApiClient();

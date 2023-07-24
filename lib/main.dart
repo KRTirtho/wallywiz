@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:desktop_wallpaper/desktop_wallpaper.dart';
 import 'package:fl_query/fl_query.dart';
 import 'package:fl_query_connectivity_plus_adapter/fl_query_connectivity_plus_adapter.dart';
@@ -8,20 +11,32 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallywiz/collections/routes.dart';
 import 'package:wallywiz/providers/preferences.dart';
-import 'package:wallywiz/providers/shuffler.dart';
+import 'package:wallywiz/services/api_client.dart';
 import 'package:wallywiz/services/periodic_task.dart';
 import 'package:wallywiz/utils/persisted_state_notifier.dart';
 import 'package:wallywiz/utils/platform.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 @pragma("vm:entry-point")
 void callbackDispatcher() {
   Workmanager().executeTask(
     (taskName, inputData) async {
       if (inputData == null) return false;
-      await PeriodicTaskService.periodicTaskJob(
-        ShufflerSource.fromJson(inputData).sources.toList(),
+      print("Native called background task: $taskName");
+      final taskService = PeriodicTaskService(apiClient: ApiClient());
+      taskService.periodicTaskJob(
+        (jsonDecode(inputData["data"]) as List)
+            .map(
+              (source) => (
+                remoteId: source["remoteId"] as String,
+                id: source["id"] as String,
+                url: source["url"] as String,
+              ),
+            )
+            .toList(),
       );
       return true;
     },
@@ -30,6 +45,7 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final packageInfo = await PackageInfo.fromPlatform();
 
   await QueryClient.initialize(
     cachePrefix: 'dev.krtirtho.wallywiz',
@@ -51,6 +67,15 @@ void main() async {
     );
   }
   if (kIsDesktop) {
+    if (kReleaseMode) {
+      launchAtStartup.setup(
+        appName: packageInfo.appName,
+        appPath: Platform.resolvedExecutable,
+      );
+      if (!await launchAtStartup.isEnabled()) {
+        await launchAtStartup.enable();
+      }
+    }
     await windowManager.ensureInitialized();
     const windowOptions = WindowOptions(
       size: Size(800, 600),
@@ -67,6 +92,7 @@ void main() async {
     });
     Wallpaper.initialize();
   }
+
   runApp(
     ProviderScope(
       child: QueryClientProvider(
