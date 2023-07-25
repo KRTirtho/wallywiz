@@ -76,6 +76,7 @@ void main() async {
         await launchAtStartup.enable();
       }
     }
+    Wallpaper.initialize();
     await windowManager.ensureInitialized();
     const windowOptions = WindowOptions(
       size: Size(800, 600),
@@ -90,7 +91,6 @@ void main() async {
       await windowManager.show();
       await windowManager.focus();
     });
-    Wallpaper.initialize();
   }
 
   runApp(

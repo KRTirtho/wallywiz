@@ -78,7 +78,7 @@ class PeriodicTaskService {
       await desktop_wallpaper.Wallpaper.set(outputFile.path);
     }
 
-    print("Wallpaper set");
+    logger.i("Wallpaper set");
   }
 
   Future<void> periodicTaskJob(List<TaskWallpaper> wallpapers) async {
@@ -99,6 +99,8 @@ class PeriodicTaskService {
               1,
         );
       }
+
+      sharedPreferences.setString("wallpaperRemoteId", newWallpaper.remoteId);
 
       logger.i(
         "Setting wallpaper: ${newWallpaper.id} ${newWallpaper.url}",

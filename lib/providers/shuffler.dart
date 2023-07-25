@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wallywiz/collections/min_max.dart';
 import 'package:wallywiz/main.dart';
 import 'package:wallywiz/models/wallpaper.dart';
 import 'package:wallywiz/services/periodic_task.dart';
@@ -77,7 +78,7 @@ class ShufflerProvider extends PersistedStateNotifier<ShufflerSource> {
   set state(ShufflerSource value) {
     if (state == value) return;
     super.state = value;
-    if (state.interval < const Duration(minutes: 15) || state.sources.isEmpty) {
+    if (!isValidDuration(state.interval) || state.sources.isEmpty) {
       return;
     }
     if (kIsMobile) {

@@ -1,6 +1,7 @@
 import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:wallywiz/collections/min_max.dart';
 import 'package:wallywiz/extensions/constrains.dart';
 
 class UnitDurationPickerDialog extends HookWidget {
@@ -26,7 +27,7 @@ class UnitDurationPickerDialog extends HookWidget {
           children: [
             DurationPicker(
               onChange: (value) {
-                if (value > const Duration(hours: 23)) return;
+                if (value > kMaximumDuration) return;
                 duration.value = value;
               },
               duration: duration.value,
@@ -80,7 +81,7 @@ class UnitDurationPickerDialog extends HookWidget {
                     const SizedBox(width: 10),
                     FilledButton(
                       child: const Text("Save"),
-                      onPressed: duration.value < const Duration(minutes: 15)
+                      onPressed: !isValidDuration(duration.value)
                           ? null
                           : () {
                               Navigator.of(context).pop(duration.value);
