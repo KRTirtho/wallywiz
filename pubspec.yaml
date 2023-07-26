@@ -25,7 +25,6 @@ dependencies:
   path_provider: ^2.0.15
   uuid: ^3.0.7
   duration: ^3.0.13
-  logger: ^1.4.0
   shared_preferences: ^2.2.0
   form_validator: ^2.1.1
   workmanager: ^0.5.1
@@ -50,6 +49,7 @@ dependencies:
   duration_picker: ^1.1.1
   google_mobile_ads: ^2.0.0
   launch_at_startup: ^0.2.2
+  logging: ^1.2.0
 
 dev_dependencies:
   flutter_test:

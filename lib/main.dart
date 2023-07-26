@@ -8,11 +8,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallywiz/collections/routes.dart';
 import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/services/api_client.dart';
 import 'package:wallywiz/services/periodic_task.dart';
+import 'package:wallywiz/utils/logger.dart';
 import 'package:wallywiz/utils/persisted_state_notifier.dart';
 import 'package:wallywiz/utils/platform.dart';
 import 'package:workmanager/workmanager.dart';
@@ -22,10 +24,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 @pragma("vm:entry-point")
 void callbackDispatcher() {
+  initLogger();
   Workmanager().executeTask(
     (taskName, inputData) async {
       if (inputData == null) return false;
-      print("Native called background task: $taskName");
+      Logger.root.info("Native called background task: $taskName");
       final taskService = PeriodicTaskService(apiClient: ApiClient());
       await taskService.periodicTaskJob(
         (jsonDecode(inputData["data"]) as List)
@@ -47,6 +50,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final packageInfo = await PackageInfo.fromPlatform();
 
+  initLogger();
+
   await QueryClient.initialize(
     cachePrefix: 'dev.krtirtho.wallywiz',
     connectivity: FlQueryConnectivityPlusAdapter(),
@@ -63,7 +68,7 @@ void main() async {
   if (kIsAndroid) {
     await Workmanager().initialize(
       callbackDispatcher,
-      isInDebugMode: kDebugMode,
+      isInDebugMode: true,
     );
   }
   if (kIsDesktop) {

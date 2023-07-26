@@ -4,33 +4,33 @@ import 'package:collection/collection.dart';
 import 'package:desktop_wallpaper/desktop_wallpaper.dart' as desktop_wallpaper;
 import 'package:dio/dio.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
+import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wallywiz/models/wallpaper.dart';
 import 'package:wallywiz/services/api_client.dart';
-import 'package:wallywiz/services/logger.dart';
 import 'package:wallywiz/utils/platform.dart';
 
 typedef TaskWallpaper = ({String remoteId, String id, String url});
 
 class PeriodicTaskService {
   final ApiClient apiClient;
-  final WallyWizLogger logger;
+  final Logger logger;
   final Dio dio;
 
   PeriodicTaskService({required this.apiClient})
-      : logger = WallyWizLogger("PeriodicTaskService"),
+      : logger = Logger("PeriodicTaskService"),
         dio = Dio();
 
   Future<void> setWallpaper(String wallpaperId, String url) async {
-    logger.i("Fetching wallpaper");
+    logger.info("Fetching wallpaper");
 
     final Wallpaper? wallpaper = await apiClient
         .getWallpaper(wallpaperId)
         .then((value) => Future<Wallpaper?>.value(value))
         .catchError((e) {
-      logger.i("Error while fetching wallpaper:\n$e");
-      logger.i("Using default wallpaper");
+      logger.info("Error while fetching wallpaper:\n$e");
+      logger.info("Using default wallpaper");
       return null;
     });
 
@@ -40,7 +40,7 @@ class PeriodicTaskService {
 
     File? outputFile;
     if (appDir.listSync().none((file) => file.path.contains(wallpaperId))) {
-      logger.i("Downloading wallpaper");
+      logger.info("Downloading wallpaper");
 
       final downloadFile = await dio.get<List<int>>(
         downloadUrl,
@@ -56,7 +56,7 @@ class PeriodicTaskService {
       outputFile = File("${appDir.path}/$wallpaperId.$extension");
       await outputFile.writeAsBytes(downloadFile.data!);
     } else {
-      logger.i("Wallpaper already downloaded");
+      logger.info("Wallpaper already downloaded");
       outputFile = File(
         appDir
             .listSync()
@@ -67,7 +67,7 @@ class PeriodicTaskService {
       );
     }
 
-    logger.i("Setting wallpaper for path: ${outputFile.path}");
+    logger.info("Setting wallpaper for path: ${outputFile.path}");
 
     if (kIsMobile) {
       await WallpaperManager.setWallpaperFromFile(
@@ -78,7 +78,7 @@ class PeriodicTaskService {
       await desktop_wallpaper.Wallpaper.set(outputFile.path);
     }
 
-    logger.i("Wallpaper set");
+    logger.info("Wallpaper set");
   }
 
   Future<void> periodicTaskJob(List<TaskWallpaper> wallpapers) async {
@@ -102,13 +102,13 @@ class PeriodicTaskService {
 
       sharedPreferences.setString("wallpaperRemoteId", newWallpaper.remoteId);
 
-      logger.i(
+      logger.info(
         "Setting wallpaper: ${newWallpaper.id} ${newWallpaper.url}",
       );
 
       await setWallpaper(newWallpaper.id, newWallpaper.url);
     } catch (e) {
-      logger.i("Error while setting wallpaper:\n$e");
+      logger.severe("Error while setting wallpaper:\n$e");
     }
   }
 }
