@@ -99,7 +99,7 @@ class ShufflerProvider extends PersistedStateNotifier<ShufflerSource> {
           WALLPAPER_TASK_NAME,
           frequency: state.interval,
           constraints: Constraints(networkType: NetworkType.connected),
-          inputData: {"data": data},
+          inputData: {"data": data, "interval": state.interval},
         );
       });
     } else {
@@ -113,9 +113,9 @@ class ShufflerProvider extends PersistedStateNotifier<ShufflerSource> {
             ),
           )
           .toList();
-      periodicTasksService.periodicTaskJob(data);
+      periodicTasksService.periodicTaskJob(state.interval, data);
       _jobTimer = Timer.periodic(state.interval, (timer) {
-        periodicTasksService.periodicTaskJob(data);
+        periodicTasksService.periodicTaskJob(state.interval, data);
       });
     }
   }

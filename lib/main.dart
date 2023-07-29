@@ -31,6 +31,7 @@ void callbackDispatcher() {
       Logger.root.info("Native called background task: $taskName");
       final taskService = PeriodicTaskService(apiClient: ApiClient());
       await taskService.periodicTaskJob(
+        inputData["interval"],
         (jsonDecode(inputData["data"]) as List)
             .map(
               (source) => (

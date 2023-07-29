@@ -81,9 +81,19 @@ class PeriodicTaskService {
     logger.info("Wallpaper set");
   }
 
-  Future<void> periodicTaskJob(List<TaskWallpaper> wallpapers) async {
+  Future<void> periodicTaskJob(
+      Duration interval, List<TaskWallpaper> wallpapers) async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
+      final lastChanged =
+          DateTime.tryParse(sharedPreferences.getString("lastChanged") ?? "");
+      final currentTime = DateTime.now();
+
+      if (lastChanged != null &&
+          currentTime.difference(lastChanged) < interval) {
+        logger.info("Not changing wallpaper");
+        return;
+      }
 
       String? activeWallpaperRemoteId =
           sharedPreferences.getString("wallpaperRemoteId");
@@ -101,6 +111,7 @@ class PeriodicTaskService {
       }
 
       sharedPreferences.setString("wallpaperRemoteId", newWallpaper.remoteId);
+      sharedPreferences.setString("lastChanged", currentTime.toIso8601String());
 
       logger.info(
         "Setting wallpaper: ${newWallpaper.id} ${newWallpaper.url}",
