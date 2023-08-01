@@ -5,6 +5,7 @@ import 'package:wallywiz/components/shared/WallpaperCarousel.dart';
 import 'package:wallywiz/components/shared/page_window_title_bar.dart';
 import 'package:wallywiz/models/category.dart';
 import 'package:wallywiz/models/wallpaper.dart';
+import 'package:wallywiz/providers/shuffler.dart';
 import 'package:wallywiz/services/queries.dart';
 import 'package:wallywiz/utils/clean-title.dart';
 
@@ -21,9 +22,40 @@ class WallpaperPage extends HookConsumerWidget {
 
     final wallpaperQuery = useApi.listCategoryWallpapers(category.id);
 
+    final shuffleSource = ref.watch(shufflerProvider);
+    final isActive = useMemoized(
+      () => shuffleSource.sources.any((s) => s.categoryId == category.id),
+      [shuffleSource.sources, category.id],
+    );
+
     return Scaffold(
       appBar: PageWindowTitleBar(
-        title: Text(cleanedTitle),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(cleanedTitle),
+            if (isActive)
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                margin: const EdgeInsets.only(left: 3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ),
+                child: const Text(
+                  'active',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
       body: WallpaperCarousel(wallpapers: wallpaperQuery.data ?? <Wallpaper>[]),
     );
