@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:supabase/supabase.dart';
 import 'package:wallywiz/collections/env.dart';
 import 'package:wallywiz/models/category.dart';
 import 'package:wallywiz/models/wallpaper.dart';
@@ -6,68 +6,84 @@ import 'package:wallywiz/models/wallpaper.dart';
 typedef PagedData<T> = ({List<T> data, int? next});
 
 class ApiClient {
-  Dio client;
+  SupabaseClient supabase;
 
-  ApiClient()
-      : client = Dio(
-          BaseOptions(
-            baseUrl: Env.apiUrl,
-            responseType: ResponseType.json,
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': Env.apiKey,
-            },
-          ),
-        );
+  ApiClient() : supabase = SupabaseClient(Env.apiUrl, Env.apiKey);
 
   Future<PagedData<Category>> listCategoriesPaginated({
     int page = 1,
   }) async {
-    final response = await client.get('/categories', queryParameters: {
-      'page': page,
-    });
-    final data = response.data as List<dynamic>;
+    final data = await supabase
+        .from("Categories")
+        .select<PostgrestList>("*,Wallpapers(thumbnail)")
+        .range(
+          page == 0 ? 0 : ((page - 1) * 10) + 1,
+          page * 10,
+        )
+        .limit(1, foreignTable: 'Wallpapers');
+
     return (
-      data: data.map((e) => Category.fromJson(e)).toList(),
+      data: data
+          .map((e) => Category.fromJson({
+                ...e,
+                "thumbnails": [e["Wallpapers"][0]["thumbnail"]]
+              }))
+          .toList(),
       next: data.length < 10 ? null : page + 1,
     );
   }
 
   Future<Category> getCategory(String id) async {
-    final response = await client.get('/categories/$id');
-    return Category.fromJson(response.data);
+    final data = await supabase
+        .from("Categories")
+        .select<PostgrestMap>("*")
+        .eq("id", id)
+        .single();
+    return Category.fromJson(data);
   }
 
   Future<Wallpaper> getWallpaper(String id) async {
-    final response = await client.get('/wallpaper/$id');
-    return Wallpaper.fromJson(response.data);
+    final response = await supabase
+        .from("Wallpapers")
+        .select<PostgrestMap>("*")
+        .eq("id", id)
+        .single();
+    return Wallpaper.fromJson(response);
   }
 
   Future<List<Wallpaper>> listCategoryWallpapers(String id) async {
-    final response = await client.get('/categories/$id/wallpapers');
-    final data = response.data as List<dynamic>;
+    final data = await supabase
+        .from("Wallpapers")
+        .select<PostgrestList>("*")
+        .eq("category_id", id);
+
     return data.map((e) => Wallpaper.fromJson(e)).toList();
   }
 
   Future<List<Wallpaper>> trendingCategoryWallpapers([int page = 1]) async {
-    final response = await client.get('/trending', queryParameters: {
-      'page': page,
-    });
+    final data = await supabase
+        .from("Wallpapers")
+        .select<PostgrestList>("*")
+        .eq("Categories.remote_id", "trending")
+        .range(
+          page == 0 ? 0 : ((page - 1) * 10) + 1,
+          page * 10,
+        );
 
-    return (response.data as List<dynamic>)
-        .map((e) => Wallpaper.fromJson(e))
-        .toList();
+    return data.map((e) => Wallpaper.fromJson(e)).toList();
   }
 
   Future<List<Wallpaper>> latestCategoryWallpapers([int page = 1]) async {
-    final response = await client.get('/latest', queryParameters: {
-      'page': page,
-    });
+    final data = await supabase
+        .from("Wallpapers")
+        .select<PostgrestList>("*")
+        .eq("Categories.remote_id", "latest")
+        .range(
+          page == 0 ? 0 : ((page - 1) * 10) + 1,
+          page * 10,
+        );
 
-    return (response.data as List<dynamic>)
-        .map((e) => Wallpaper.fromJson(e))
-        .toList();
+    return data.map((e) => Wallpaper.fromJson(e)).toList();
   }
 }
 

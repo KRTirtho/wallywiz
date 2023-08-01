@@ -50,6 +50,7 @@ dependencies:
   google_mobile_ads: ^2.0.0
   launch_at_startup: ^0.2.2
   logging: ^1.2.0
+  supabase: ^1.9.8
 
 dev_dependencies:
   flutter_test:
