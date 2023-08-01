@@ -16,6 +16,7 @@ class ApiClient {
     final data = await supabase
         .from("Categories")
         .select<PostgrestList>("*,Wallpapers(thumbnail)")
+        .not("remote_id", "in", ["trending", "latest"])
         .range(
           page == 0 ? 0 : ((page - 1) * 10) + 1,
           page * 10,
@@ -63,7 +64,7 @@ class ApiClient {
   Future<List<Wallpaper>> trendingCategoryWallpapers([int page = 1]) async {
     final data = await supabase
         .from("Wallpapers")
-        .select<PostgrestList>("*")
+        .select<PostgrestList>("*, Categories!inner(remote_id)")
         .eq("Categories.remote_id", "trending")
         .range(
           page == 0 ? 0 : ((page - 1) * 10) + 1,
@@ -76,7 +77,7 @@ class ApiClient {
   Future<List<Wallpaper>> latestCategoryWallpapers([int page = 1]) async {
     final data = await supabase
         .from("Wallpapers")
-        .select<PostgrestList>("*")
+        .select<PostgrestList>("*, Categories!inner(remote_id)")
         .eq("Categories.remote_id", "latest")
         .range(
           page == 0 ? 0 : ((page - 1) * 10) + 1,

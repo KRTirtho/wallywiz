@@ -99,7 +99,7 @@ class ShufflerProvider extends PersistedStateNotifier<ShufflerSource> {
           WALLPAPER_TASK_NAME,
           frequency: state.interval,
           constraints: Constraints(networkType: NetworkType.connected),
-          inputData: {"data": data, "interval": state.interval},
+          inputData: {"data": data, "interval": state.interval.inSeconds},
         );
       });
     } else {
