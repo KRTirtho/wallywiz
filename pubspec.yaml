@@ -51,6 +51,9 @@ dependencies:
   launch_at_startup: ^0.2.2
   logging: ^1.2.0
   supabase: ^1.9.8
+  alfred: ^1.1.1
+  http: ^1.1.0
+  local_notifier: ^0.1.5
 
 dev_dependencies:
   flutter_test:

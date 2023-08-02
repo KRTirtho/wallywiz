@@ -6,11 +6,16 @@ import 'package:fl_query/fl_query.dart';
 import 'package:fl_query_connectivity_plus_adapter/fl_query_connectivity_plus_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:wallywiz/api/api.dart';
 import 'package:wallywiz/collections/routes.dart';
+import 'package:wallywiz/hooks/useWindowListeners.dart';
 import 'package:wallywiz/providers/preferences.dart';
 import 'package:wallywiz/services/api_client.dart';
 import 'package:wallywiz/services/periodic_task.dart';
@@ -47,11 +52,28 @@ void callbackDispatcher() {
   );
 }
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   final packageInfo = await PackageInfo.fromPlatform();
 
   initLogger();
+
+  // check if an instance is already running
+  // if not then start the api server to indicate future launches
+  // that there's a running instance
+  if (kIsDesktop) {
+    try {
+      final res = await get(Uri.parse("http://localhost:$kDefaultPort/show"))
+          .then((res) => jsonDecode(res.body));
+      if (res["visible"] == true) {
+        exit(0);
+      } else {
+        throw Exception("Window not visible");
+      }
+    } catch (e) {
+      await api();
+    }
+  }
 
   await QueryClient.initialize(
     cachePrefix: 'dev.krtirtho.wallywiz',
@@ -77,12 +99,17 @@ void main() async {
       launchAtStartup.setup(
         appName: packageInfo.appName,
         appPath: Platform.resolvedExecutable,
+        args: <String>["--headless"],
       );
       if (!await launchAtStartup.isEnabled()) {
         await launchAtStartup.enable();
       }
     }
     Wallpaper.initialize();
+    await localNotifier.setup(
+      appName: 'WallyWiz',
+      shortcutPolicy: ShortcutPolicy.requireCreate,
+    );
     await windowManager.ensureInitialized();
     const windowOptions = WindowOptions(
       size: Size(800, 600),
@@ -94,6 +121,8 @@ void main() async {
       minimumSize: Size(400, 300),
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
+      final isHeadless = args.contains("--headless");
+      if (isHeadless) return;
       await windowManager.show();
       await windowManager.focus();
     });
@@ -121,6 +150,23 @@ class MyApp extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final preferences = ref.watch(userPreferencesProvider);
+    final isHidden = useState(false);
+
+    useWindowListeners(onWindowEvent: (event) {
+      if (event == "hide") {
+        isHidden.value = true;
+        router.go("/");
+        QueryClient.of(context).cache.clear();
+      }
+      if (event == "show") {
+        isHidden.value = false;
+      }
+    });
+
+    if (isHidden.value) {
+      return const MaterialApp(title: 'Wallywiz');
+    }
+
     return MaterialApp.router(
       title: 'WallyWiz',
       themeMode: preferences.themeMode,

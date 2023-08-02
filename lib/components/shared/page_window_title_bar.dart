@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:titlebar_buttons/titlebar_buttons.dart';
 import 'package:wallywiz/utils/platform.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:math';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
+
+final closeNotification = LocalNotification(
+  title: 'WallyWiz',
+  body: 'Running worker in background',
+  identifier: 'closeNotification',
+  actions: [
+    LocalNotificationAction(text: 'Open app'),
+  ],
+)
+  ..onClick = () {
+    windowManager.show();
+  }
+  ..onClickAction = (value) {
+    windowManager.show();
+  };
 
 class PageWindowTitleBar extends StatefulHookWidget
     implements PreferredSizeWidget {
@@ -104,12 +120,8 @@ class WindowTitleBarButtons extends HookConsumerWidget {
     const type = ThemeType.auto;
 
     Future<void> onClose() async {
-      // if (closeBehavior == CloseBehavior.close) {
-      await windowManager.close();
-      // } else {
-      //   await windowManager.hide();
-      //   await closeNotification?.show();
-      // }
+      await windowManager.hide();
+      await closeNotification.show();
     }
 
     useEffect(() {
