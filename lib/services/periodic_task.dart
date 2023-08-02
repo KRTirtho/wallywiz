@@ -13,6 +13,9 @@ import 'package:wallywiz/utils/platform.dart';
 
 typedef TaskWallpaper = ({String remoteId, String id, String url});
 
+const kLastChanged = "lastChanged";
+const kWallpaperRemoteId = "wallpaperRemoteId";
+
 class PeriodicTaskService {
   final ApiClient apiClient;
   final Logger logger;
@@ -81,22 +84,32 @@ class PeriodicTaskService {
     logger.info("Wallpaper set");
   }
 
+  Future<void> resetCache() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove(kLastChanged);
+    sharedPreferences.remove(kWallpaperRemoteId);
+  }
+
   Future<void> periodicTaskJob(
-      Duration interval, List<TaskWallpaper> wallpapers) async {
+    Duration interval,
+    List<TaskWallpaper> wallpapers,
+  ) async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
       final lastChanged =
-          DateTime.tryParse(sharedPreferences.getString("lastChanged") ?? "");
+          DateTime.tryParse(sharedPreferences.getString(kLastChanged) ?? "");
+
       final currentTime = DateTime.now();
 
       if (lastChanged != null &&
           currentTime.difference(lastChanged) < interval) {
         logger.info("Not changing wallpaper");
+        logger.info("Last changed: ${lastChanged.toIso8601String()}");
         return;
       }
 
       String? activeWallpaperRemoteId =
-          sharedPreferences.getString("wallpaperRemoteId");
+          sharedPreferences.getString(kWallpaperRemoteId);
       TaskWallpaper? newWallpaper;
 
       if (activeWallpaperRemoteId == null ||
@@ -110,8 +123,8 @@ class PeriodicTaskService {
         );
       }
 
-      sharedPreferences.setString("wallpaperRemoteId", newWallpaper.remoteId);
-      sharedPreferences.setString("lastChanged", currentTime.toIso8601String());
+      sharedPreferences.setString(kWallpaperRemoteId, newWallpaper.remoteId);
+      sharedPreferences.setString(kLastChanged, currentTime.toIso8601String());
 
       logger.info(
         "Setting wallpaper: ${newWallpaper.id} ${newWallpaper.url}",

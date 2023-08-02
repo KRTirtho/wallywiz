@@ -19,18 +19,26 @@ final adClickCounter = StateProvider((ref) => 0);
 class WallpaperCarousel extends HookConsumerWidget {
   final List<Wallpaper> wallpapers;
   final VoidCallback? onEndReached;
+  final bool isCollectionActive;
   const WallpaperCarousel({
     Key? key,
     required this.wallpapers,
+    required this.isCollectionActive,
     this.onEndReached,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, ref) {
     final controller = useMemoized(() => CarouselController(), []);
-    final duration = useState<Duration>(Duration.zero);
-    final durationController = useTextEditingController();
     final shuffler = ref.watch(shufflerProvider);
+    final duration = useState<Duration>(
+      isCollectionActive ? shuffler.interval : Duration.zero,
+    );
+    final durationController = useTextEditingController(
+      text: isCollectionActive
+          ? '${duration.value.inHours}h:${duration.value.inMinutes.remainder(60)}m'
+          : null,
+    );
 
     final selectedWallpapers = useState<Set<Wallpaper>>({});
 

@@ -138,6 +138,9 @@ class ShufflerProvider extends PersistedStateNotifier<ShufflerSource> {
   }
 
   void setShuffleSource(ShufflerSource source) {
+    if (state != source) {
+      periodicTasksService.resetCache();
+    }
     state = source;
   }
 

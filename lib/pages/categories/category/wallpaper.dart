@@ -57,7 +57,10 @@ class WallpaperPage extends HookConsumerWidget {
           ],
         ),
       ),
-      body: WallpaperCarousel(wallpapers: wallpaperQuery.data ?? <Wallpaper>[]),
+      body: WallpaperCarousel(
+        wallpapers: wallpaperQuery.data ?? <Wallpaper>[],
+        isCollectionActive: isActive,
+      ),
     );
   }
 }

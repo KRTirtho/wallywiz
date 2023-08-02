@@ -23,6 +23,7 @@ class LatestPage extends HookConsumerWidget {
     return Scaffold(
       body: WallpaperCarousel(
         wallpapers: wallpapers,
+        isCollectionActive: false,
         onEndReached: () {
           if (wallpapersQuery.hasNextPage) {
             wallpapersQuery.fetchNext();
