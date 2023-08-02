@@ -1,0 +1,27 @@
+display_name: WallyWiz
+package_name: wallywiz
+
+maintainer:
+  name: Kingkor Roy Tirtho
+  email: krtirtho@gmail.com
+
+priority: optional
+section: x11
+installed_size: 24400
+
+dependencies:
+  - libnotify-bin
+
+essential: false
+icon: assets/logo.png
+
+keywords:
+  - Wallpaper
+  - Image
+  - Background
+  - Photo
+
+generic_name: 
+categories:
+  - Utility
+  - Graphics
