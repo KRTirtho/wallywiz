@@ -54,6 +54,8 @@ dependencies:
   alfred: ^1.1.1
   http: ^1.1.0
   local_notifier: ^0.1.5
+  flashy_tab_bar2: ^0.0.6
+  flutter_side_menu: ^0.4.0
 
 dev_dependencies:
   flutter_test:

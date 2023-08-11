@@ -184,18 +184,19 @@ class MyApp extends HookConsumerWidget {
         ),
         listTileTheme: const ListTileThemeData(horizontalTitleGap: 10),
         inputDecorationTheme: const InputDecorationTheme(
-            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black, width: .5),
-            ),
-            focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue, width: 2)),
-            errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red, width: 2),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red, width: 2),
-            )),
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black, width: .5),
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue, width: 2)),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+        ),
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(

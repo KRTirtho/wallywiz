@@ -49,6 +49,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  auto_size_text:
+    dependency: transitive
+    description:
+      name: auto_size_text
+      sha256: "3f5261cd3fb5f2a9ab4e2fc3fba84fd9fcaac8821f20a1d4e71f557521b22599"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
+  badges:
+    dependency: transitive
+    description:
+      name: badges
+      sha256: "6e7f3ec561ec08f47f912cfe349d4a1707afdc8dda271e17b046aa6d42c89e77"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -432,6 +448,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0-alpha.3"
+  flashy_tab_bar2:
+    dependency: "direct main"
+    description:
+      name: flashy_tab_bar2
+      sha256: "895affd69b757ae2a1461ddc42a3c04954a5bb4e2292373697e40c377e836153"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -509,6 +533,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.78.0"
+  flutter_side_menu:
+    dependency: "direct main"
+    description:
+      name: flutter_side_menu
+      sha256: "939cbb4532e8972115d18b058a69dcb9727249d0694bb3fdef1c958dbf48ed83"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   flutter_svg:
     dependency: "direct main"
     description:

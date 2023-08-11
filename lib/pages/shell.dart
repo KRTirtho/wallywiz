@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wallywiz/components/shared/page_window_title_bar.dart';
+import 'package:wallywiz/components/shell/custom_adaptive_scaffold.dart';
 
 class ShellRoutePage extends HookWidget {
   final Widget child;
@@ -13,7 +14,7 @@ class ShellRoutePage extends HookWidget {
   Widget build(BuildContext context) {
     final index = useState(0);
 
-    return AdaptiveScaffold(
+    return CustomAdaptiveScaffold(
       destinations: const [
         // Categories
         NavigationDestination(
@@ -33,7 +34,6 @@ class ShellRoutePage extends HookWidget {
           selectedIcon: Icon(Icons.new_releases_rounded),
         ),
       ],
-      useDrawer: false,
       appBar: PageWindowTitleBar(
         scrolledUnderElevation: 0,
         leading: Padding(
@@ -61,11 +61,9 @@ class ShellRoutePage extends HookWidget {
           ),
         ],
       ),
-      appBarBreakpoint: Breakpoints.standard,
-      body: (context) => child,
-      internalAnimations: false,
+      body: child,
       selectedIndex: index.value,
-      onSelectedIndexChange: (newIndex) {
+      onDestinationSelected: (newIndex) {
         index.value = newIndex;
         switch (newIndex) {
           case 0:
