@@ -18,6 +18,8 @@ class WallpaperCarouselItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final mediaQuery = MediaQuery.of(context);
+
     return InkWell(
       borderRadius: BorderRadius.circular(15),
       onLongPress: onLongPress,
@@ -29,7 +31,10 @@ class WallpaperCarouselItem extends HookConsumerWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: CachedNetworkImage(
-                  imageUrl: wallpaper.hdUrl,
+                  imageUrl: wallpaper.remoteApi == "unsplash"
+                      ? wallpaper.hdUrl +
+                          '&w=${mediaQuery.size.width > 1080 ? 1080 : mediaQuery.size.width}'
+                      : wallpaper.hdUrl,
                   fit: BoxFit.cover,
                   progressIndicatorBuilder: (context, url, progress) {
                     return Stack(
