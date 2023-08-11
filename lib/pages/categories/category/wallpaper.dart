@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/components/shared/WallpaperCarousel.dart';
+import 'package:wallywiz/components/shared/WallpaperForm.dart';
 import 'package:wallywiz/components/shared/page_window_title_bar.dart';
 import 'package:wallywiz/models/category.dart';
 import 'package:wallywiz/models/wallpaper.dart';
@@ -27,6 +28,8 @@ class WallpaperPage extends HookConsumerWidget {
       () => shuffleSource.sources.any((s) => s.categoryId == category.id),
       [shuffleSource.sources, category.id],
     );
+
+    final selectedWallpapers = useState<Set<Wallpaper>>({});
 
     return Scaffold(
       appBar: PageWindowTitleBar(
@@ -60,6 +63,12 @@ class WallpaperPage extends HookConsumerWidget {
       body: WallpaperCarousel(
         wallpapers: wallpaperQuery.data ?? <Wallpaper>[],
         isCollectionActive: isActive,
+        selectedWallpapers: selectedWallpapers,
+        form: WallpaperForm(
+          isCollectionActive: isActive,
+          selectedWallpapers: selectedWallpapers.value,
+          wallpapers: wallpaperQuery.data ?? <Wallpaper>[],
+        ),
       ),
     );
   }

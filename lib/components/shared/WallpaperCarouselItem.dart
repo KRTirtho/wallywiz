@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +31,48 @@ class WallpaperCarouselItem extends HookConsumerWidget {
                 child: CachedNetworkImage(
                   imageUrl: wallpaper.hdUrl,
                   fit: BoxFit.cover,
+                  progressIndicatorBuilder: (context, url, progress) {
+                    return Stack(
+                      children: [
+                        Positioned.fill(
+                          child: CachedNetworkImage(
+                            imageUrl: wallpaper.thumbnail,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        if (progress.progress != null)
+                          Center(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: SizedBox.square(
+                                dimension: 60,
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 10,
+                                    sigmaY: 10,
+                                  ),
+                                  child: CircularProgressIndicator(
+                                    value: progress.progress,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        Center(
+                          child: Text(
+                            '${((progress.progress ?? 0) * 100).round()}%',
+                            style: const TextStyle(shadows: [
+                              Shadow(
+                                blurRadius: 1,
+                                color: Colors.white,
+                                offset: Offset(-1, -1),
+                              ),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

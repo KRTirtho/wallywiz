@@ -5,47 +5,36 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:wallywiz/collections/ad_ids.dart';
-import 'package:wallywiz/components/shared/UnitDurationPickerDialog.dart';
 import 'package:wallywiz/components/shared/WallpaperCarouselItem.dart';
 import 'package:wallywiz/extensions/constrains.dart';
-import 'package:wallywiz/hooks/useInterstitialAd.dart';
 import 'package:wallywiz/hooks/useMultiBannerAds.dart';
 import 'package:wallywiz/models/wallpaper.dart';
-import 'package:wallywiz/providers/shuffler.dart';
-
-final adClickCounter = StateProvider((ref) => 0);
 
 class WallpaperCarousel extends HookConsumerWidget {
   final List<Wallpaper> wallpapers;
+  final ValueNotifier<Set<Wallpaper>> selectedWallpapers;
   final VoidCallback? onEndReached;
   final bool isCollectionActive;
+
+  final Widget? form;
+
   const WallpaperCarousel({
     Key? key,
     required this.wallpapers,
+    required this.selectedWallpapers,
     required this.isCollectionActive,
     this.onEndReached,
+    this.form,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, ref) {
     final controller = useMemoized(() => CarouselController(), []);
-    final shuffler = ref.watch(shufflerProvider);
-    final duration = useState<Duration>(
-      isCollectionActive ? shuffler.interval : Duration.zero,
-    );
-    final durationController = useTextEditingController(
-      text: isCollectionActive
-          ? '${duration.value.inHours}h:${duration.value.inMinutes.remainder(60)}m'
-          : null,
-    );
-
-    final selectedWallpapers = useState<Set<Wallpaper>>({});
-
-    final interstitialAd = useInterstitialAd(AdIds.openCategoryInterstitial);
 
     final adFilledWallpapers =
         useMultiBannerAds(items: wallpapers, adSize: AdSize.mediumRectangle);
+
+    final mediaQuery = MediaQuery.of(context);
 
     final carouselSlider = CarouselSlider(
       carouselController: controller,
@@ -170,18 +159,6 @@ class WallpaperCarousel extends HookConsumerWidget {
       ),
     );
 
-    onDurationPicker() async {
-      final durationVal = await showDialog<Duration>(
-        context: context,
-        builder: (context) =>
-            UnitDurationPickerDialog(initialDuration: duration.value),
-      );
-      if (durationVal == null) return;
-      duration.value = durationVal;
-      durationController.text =
-          '${durationVal.inHours}h:${durationVal.inMinutes.remainder(60)}m';
-    }
-
     return WillPopScope(
       onWillPop: () {
         if (selectedWallpapers.value.isNotEmpty) {
@@ -202,123 +179,45 @@ class WallpaperCarousel extends HookConsumerWidget {
         child: Focus(
           autofocus: true,
           child: SafeArea(
-            child: LayoutBuilder(builder: (context, constrains) {
-              return SingleChildScrollView(
-                physics: constrains.mdAndUp
-                    ? const NeverScrollableScrollPhysics()
-                    : null,
-                child: Flex(
-                  direction:
-                      constrains.mdAndUp ? Axis.horizontal : Axis.vertical,
-                  children: [
-                    SizedBox(
-                      height:
-                          constrains.maxHeight - (constrains.mdAndUp ? 0 : 120),
-                      width: constrains.mdAndUp
-                          ? constrains.maxWidth * 0.7
-                          : constrains.maxWidth,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: selectedWallpapers.value.isEmpty
-                            ? carouselSlider
-                            : selectionGridView,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+            child: form == null
+                ? AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: selectedWallpapers.value.isEmpty
+                        ? carouselSlider
+                        : selectionGridView,
+                  )
+                : LayoutBuilder(builder: (context, constrains) {
+                    return SingleChildScrollView(
+                      physics: mediaQuery.mdAndUp
+                          ? const NeverScrollableScrollPhysics()
+                          : null,
+                      child: Flex(
+                        direction: mediaQuery.mdAndUp
+                            ? Axis.horizontal
+                            : Axis.vertical,
                         children: [
-                          TextField(
-                            controller: durationController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            readOnly: true,
-                            onTap: onDurationPicker,
-                            decoration: InputDecoration(
-                                constraints: BoxConstraints(
-                                  maxWidth: constrains.mdAndUp
-                                      ? constrains.maxWidth * 0.3 - 50
-                                      : constrains.maxWidth,
-                                ),
-                                labelText: 'Shuffle Duration',
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: IconButton.filledTonal(
-                                    icon: const Icon(Icons.timer_outlined),
-                                    style: IconButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    onPressed: onDurationPicker,
-                                  ),
-                                )),
+                          SizedBox(
+                            height: constrains.maxHeight -
+                                (constrains.mdAndUp ? 0 : 120),
+                            width: constrains.mdAndUp
+                                ? constrains.maxWidth - 300
+                                : constrains.maxWidth,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: selectedWallpapers.value.isEmpty
+                                  ? carouselSlider
+                                  : selectionGridView,
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          FilledButton.tonalIcon(
-                            icon: const Icon(Icons.play_arrow_outlined),
-                            label: Text(
-                              selectedWallpapers.value.isEmpty
-                                  ? 'Shuffle Wallpapers'
-                                  : 'Shuffle Selected Wallpapers',
-                            ),
-                            style: FilledButton.styleFrom(
-                              minimumSize: Size(
-                                ((constrains.mdAndUp
-                                        ? constrains.maxWidth -
-                                            (constrains.maxWidth * 0.7)
-                                        : constrains.maxWidth)) -
-                                    20,
-                                40,
-                              ),
-                            ),
-                            onPressed: () async {
-                              final clicked = ref.read(adClickCounter);
-                              final sourceWallpapers =
-                                  selectedWallpapers.value.isNotEmpty
-                                      ? selectedWallpapers.value
-                                      : wallpapers.toSet();
-                              // don't show the ad if the user has clicked 3 times
-                              if (clicked == 2) {
-                                await interstitialAd?.show().then((_) {
-                                  ref
-                                      .read(shufflerProvider.notifier)
-                                      .setShuffleSource(
-                                        ShufflerSource(
-                                          interval: duration.value,
-                                          sources: sourceWallpapers,
-                                        ),
-                                      );
-                                });
-                                ref
-                                    .read(adClickCounter.notifier)
-                                    .update((s) => 1);
-                              } else {
-                                ref
-                                    .read(shufflerProvider.notifier)
-                                    .setShuffleSource(
-                                      ShufflerSource(
-                                        interval: duration.value,
-                                        sources: sourceWallpapers,
-                                      ),
-                                    );
-                                ref
-                                    .read(adClickCounter.notifier)
-                                    .update((s) => s + 1);
-                              }
-                            },
+                          SizedBox(
+                            width:
+                                constrains.mdAndUp ? 300 : constrains.maxWidth,
+                            child: form!,
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              );
-            }),
+                    );
+                  }),
           ),
         ),
       ),

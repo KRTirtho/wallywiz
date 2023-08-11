@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallywiz/collections/ad_ids.dart';
 import 'package:wallywiz/components/shared/WallpaperCarousel.dart';
 import 'package:wallywiz/hooks/useBannerAd.dart';
+import 'package:wallywiz/models/wallpaper.dart';
 import 'package:wallywiz/services/queries.dart';
 
 class TrendingPage extends HookConsumerWidget {
@@ -19,6 +20,7 @@ class TrendingPage extends HookConsumerWidget {
         [wallpapersQuery.pages]);
 
     final (:bannerAd, :isAdLoaded) = useBannerAd(adUnitId: AdIds.bottomBanner);
+    final selectedWallpapers = useState<Set<Wallpaper>>({});
 
     return Scaffold(
       body: WallpaperCarousel(
@@ -29,6 +31,7 @@ class TrendingPage extends HookConsumerWidget {
             wallpapersQuery.fetchNext();
           }
         },
+        selectedWallpapers: selectedWallpapers,
       ),
       bottomNavigationBar: isAdLoaded
           ? SizedBox(
