@@ -204,7 +204,6 @@ class MyApp extends HookConsumerWidget {
           brightness: Brightness.dark,
           accentColor: Colors.grey,
           errorColor: Colors.red,
-          primaryColorDark: Colors.grey,
           primarySwatch: Colors.grey,
           cardColor: Colors.grey[850],
         ),
